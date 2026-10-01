@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320">
+  <title>Illustrative red T-shirt, product 6</title>
+  <rect width="480" height="320" rx="24" fill="#eef2f6"/>
+  <ellipse cx="240" cy="253" rx="125" ry="13" fill="#d5dce5"/>
+  <path d="M194 68 Q240 98 286 68 L354 111 L322 161 L295 145 V248 H185 V145 L158 161 L126 111Z" fill="#d93648" stroke="#b52132" stroke-width="5"/>
+  <path d="M213 77 Q240 122 267 77" fill="none" stroke="#8b1726" stroke-width="8"/>
+  <path d="M185 230 H295" stroke="#f17480" stroke-width="4"/>
+  <text x="240" y="287" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#344054">Artificial vector: [0.20, 0.90, 0.15]</text>
+</svg>

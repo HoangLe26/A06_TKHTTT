@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320">
+  <title>Illustrative black leather bag, product 3</title>
+  <rect width="480" height="320" rx="24" fill="#eef2f6"/>
+  <ellipse cx="240" cy="254" rx="126" ry="13" fill="#d5dce5"/>
+  <path d="M188 125 V93 Q188 43 240 43 Q292 43 292 93 V125" fill="none" stroke="#252a34" stroke-width="17"/>
+  <path d="M126 119 H354 L368 246 H112Z" fill="#252a34" stroke="#121826" stroke-width="5"/>
+  <path d="M129 145 H351 M159 154 V225 M321 154 V225" fill="none" stroke="#596274" stroke-width="3"/>
+  <rect x="228" y="141" width="24" height="21" rx="3" fill="#d2b36c"/>
+  <text x="240" y="287" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#344054">Artificial vector: [0.12, 0.20, 0.93]</text>
+</svg>

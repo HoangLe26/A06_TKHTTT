@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320">
+  <title>Illustrative black running shoe, product 1</title>
+  <rect width="480" height="320" rx="24" fill="#eef2f6"/>
+  <ellipse cx="242" cy="248" rx="178" ry="17" fill="#d5dce5"/>
+  <path d="M77 206 L97 125 Q130 168 169 142 L201 109 Q247 167 290 183 L373 195 Q403 202 410 224 L80 224Z" fill="#252a34"/>
+  <path d="M79 220 L410 220 L405 242 L78 242Z" fill="#ffffff" stroke="#8c96a7" stroke-width="3"/>
+  <path d="M187 145 L231 163 M201 160 L245 178 M217 175 L259 193" fill="none" stroke="#fafafa" stroke-width="8" stroke-linecap="round"/>
+  <path d="M277 201 L341 203" fill="none" stroke="#7b8a9f" stroke-width="7" stroke-linecap="round"/>
+  <text x="240" y="287" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#344054">Artificial vector: [0.95, 0.10, 0.15]</text>
+</svg>

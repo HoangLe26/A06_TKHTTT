@@ -1,0 +1,12 @@
+[
+  {"id": 1, "name": "Nike Running Shoes", "category": "shoes", "color": "black", "price": 120, "stock": 10, "embedding": [0.95, 0.10, 0.15]},
+  {"id": 2, "name": "Adidas Running Shoes", "category": "shoes", "color": "white", "price": 100, "stock": 15, "embedding": [0.88, 0.18, 0.12]},
+  {"id": 3, "name": "Black Leather Bag", "category": "bag", "color": "black", "price": 80, "stock": 20, "embedding": [0.12, 0.20, 0.93]},
+  {"id": 4, "name": "Blue Sports Shoes", "category": "shoes", "color": "blue", "price": 75, "stock": 12, "embedding": [0.82, 0.25, 0.20]},
+  {"id": 5, "name": "Nike Casual Shoes", "category": "shoes", "color": "white", "price": 90, "stock": 8, "embedding": [0.80, 0.20, 0.15]},
+  {"id": 6, "name": "Red T-Shirt", "category": "clothing", "color": "red", "price": 35, "stock": 30, "embedding": [0.20, 0.90, 0.15]},
+  {"id": 7, "name": "Black Hoodie", "category": "clothing", "color": "black", "price": 60, "stock": 18, "embedding": [0.25, 0.85, 0.20]},
+  {"id": 8, "name": "Brown Backpack", "category": "bag", "color": "brown", "price": 55, "stock": 14, "embedding": [0.15, 0.25, 0.88]},
+  {"id": 9, "name": "White Sneakers", "category": "shoes", "color": "white", "price": 70, "stock": 22, "embedding": [0.78, 0.28, 0.18]},
+  {"id": 10, "name": "Sports Cap", "category": "accessory", "color": "black", "price": 25, "stock": 40, "embedding": [0.35, 0.45, 0.30]}
+]
