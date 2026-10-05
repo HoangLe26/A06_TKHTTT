@@ -1,17 +1,11 @@
-# Ảnh minh họa cho demo
+# Ảnh sản phẩm thật
 
-Ba ảnh SVG tự vẽ dùng để minh họa bộ dữ liệu khi trình bày bài. Có thể mở bằng trình duyệt; không cần tải ảnh hay cài mô hình AI.
+`catalog/` chứa 20 ảnh sản phẩm từ website/CDN chính hãng Apple, ASUS và Logitech, không dùng ảnh sinh bởi AI. Mỗi sản phẩm trong `../products.json` có đường dẫn `image`, trang `source_url` và link gốc `image_source_url`.
 
-| Ảnh | ID sản phẩm | Vector nhân tạo trong products.json |
-| --- | --- | --- |
-| shoe.svg | 1 — Nike Running Shoes | [0.95, 0.10, 0.15] |
-| bag.svg | 3 — Black Leather Bag | [0.12, 0.20, 0.93] |
-| shirt.svg | 6 — Red T-Shirt | [0.20, 0.90, 0.15] |
+Xem [PRODUCT_SOURCES.md](../PRODUCT_SOURCES.md) để kiểm tra nguồn từng ảnh. Ảnh được lưu cục bộ để giao diện không phụ thuộc vào hotlink. Các tên/model/màu được đối chiếu với nguồn; giá và tồn kho vẫn là demo.
 
-Các vector được gán thủ công để mô phỏng đặc trưng ảnh. Chương trình **không đọc pixel hay trích xuất vector từ SVG**; truyền vector bằng `--embedding`. Ví dụ từ thư mục `CodePython`:
+Ảnh thật **không có nghĩa là tìm kiếm đã dùng mô hình thị giác**. Vector 3 chiều được gán thủ công, preset lấy vector từ chính bản ghi sản phẩm. Ảnh riêng tải lên chỉ dùng preview và cần nhập vector tay.
 
-```powershell
-python main.py --mode image --embedding 0.12 0.20 0.93 --top-k 3
-```
+Các file SVG cũ được giữ lại cho lịch sử demo, không còn được dùng cho ảnh sản phẩm hoặc fallback của giao diện hiện tại.
 
-Kết quả đầu tiên phải là `Black Leather Bag`, similarity bằng `1.0000`.
+Ảnh/nhãn hiệu thuộc nhà sản xuất; việc lưu nguồn không cấp phép sử dụng thương mại. Cần kiểm tra quyền sử dụng trước khi công khai hoặc kinh doanh.

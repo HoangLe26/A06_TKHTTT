@@ -4,7 +4,9 @@ import argparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import mimetypes
+import os
 from pathlib import Path
+import socket
 from urllib.parse import unquote, urlsplit
 
 if __package__:
@@ -41,7 +43,14 @@ def build_services():
 
 class SearchHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
-    allow_reuse_address = True
+    allow_reuse_address = os.name != 'nt'
+
+    def server_bind(self):
+        # On Windows SO_REUSEADDR can let two live servers share a port,
+        # causing requests to reach an older application instance.
+        if os.name == 'nt':
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
 
     def __init__(self, address, search_service, order_service, frontend_root=FRONTEND_ROOT):
         self.search_service = search_service
@@ -98,7 +107,7 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
             if path.startswith('/assets/'):
                 return self._static(self.server.frontend_root / 'assets', path[8:], {'.js', '.css', '.svg'}, head)
             if path.startswith('/product-images/'):
-                return self._static(IMAGE_ROOT, path[16:], {'.svg', '.png', '.jpg', '.jpeg'}, head)
+                return self._static(IMAGE_ROOT, path[16:], {'.svg', '.png', '.jpg', '.jpeg', '.webp'}, head)
             if path == '/api/health':
                 catalog = self.server.search_service.catalog()
                 return self._send(200, {'status': 'ok', 'product_count': len(catalog['products']),

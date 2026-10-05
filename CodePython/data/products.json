@@ -1,12 +1,523 @@
 [
-  {"id": 1, "name": "Nike Running Shoes", "category": "shoes", "color": "black", "price": 120, "stock": 10, "embedding": [0.95, 0.10, 0.15]},
-  {"id": 2, "name": "Adidas Running Shoes", "category": "shoes", "color": "white", "price": 100, "stock": 15, "embedding": [0.88, 0.18, 0.12]},
-  {"id": 3, "name": "Black Leather Bag", "category": "bag", "color": "black", "price": 80, "stock": 20, "embedding": [0.12, 0.20, 0.93]},
-  {"id": 4, "name": "Blue Sports Shoes", "category": "shoes", "color": "blue", "price": 75, "stock": 12, "embedding": [0.82, 0.25, 0.20]},
-  {"id": 5, "name": "Nike Casual Shoes", "category": "shoes", "color": "white", "price": 90, "stock": 8, "embedding": [0.80, 0.20, 0.15]},
-  {"id": 6, "name": "Red T-Shirt", "category": "clothing", "color": "red", "price": 35, "stock": 30, "embedding": [0.20, 0.90, 0.15]},
-  {"id": 7, "name": "Black Hoodie", "category": "clothing", "color": "black", "price": 60, "stock": 18, "embedding": [0.25, 0.85, 0.20]},
-  {"id": 8, "name": "Brown Backpack", "category": "bag", "color": "brown", "price": 55, "stock": 14, "embedding": [0.15, 0.25, 0.88]},
-  {"id": 9, "name": "White Sneakers", "category": "shoes", "color": "white", "price": 70, "stock": 22, "embedding": [0.78, 0.28, 0.18]},
-  {"id": 10, "name": "Sports Cap", "category": "accessory", "color": "black", "price": 25, "stock": 40, "embedding": [0.35, 0.45, 0.30]}
+  {
+    "id": 1,
+    "name": "Apple iPhone 16",
+    "category": "phone",
+    "color": "ultramarine",
+    "price": 799,
+    "stock": 12,
+    "embedding": [
+      0.95,
+      0.1,
+      0.05
+    ],
+    "image": "catalog/apple-iphone-16-ultramarine.jpg",
+    "source_url": "https://support.apple.com/en-us/121029",
+    "image_source_url": "https://www.apple.com/v/iphone/compare/am/images/overview/compare_iphone16_ultramarine__sr260qois4am_large_2x.jpg",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "điện thoại",
+      "dien thoai",
+      "smartphone"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 2,
+    "name": "Apple iPhone 16 Plus",
+    "category": "phone",
+    "color": "teal",
+    "price": 899,
+    "stock": 9,
+    "embedding": [
+      0.91,
+      0.13,
+      0.06
+    ],
+    "image": "catalog/apple-iphone-16-plus-teal.jpg",
+    "source_url": "https://support.apple.com/en-us/121030",
+    "image_source_url": "https://www.apple.com/v/iphone/compare/am/images/overview/compare_iphone16_plus_teal__fd5m157o5h6y_large_2x.jpg",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "điện thoại",
+      "dien thoai",
+      "smartphone"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 3,
+    "name": "Apple iPhone 16 Pro",
+    "category": "phone",
+    "color": "desert titanium",
+    "price": 999,
+    "stock": 7,
+    "embedding": [
+      0.97,
+      0.09,
+      0.08
+    ],
+    "image": "catalog/apple-iphone-16-pro-desert-titanium.jpg",
+    "source_url": "https://support.apple.com/en-us/121031",
+    "image_source_url": "https://www.apple.com/v/iphone/compare/am/images/overview/compare_iphone16_pro_desert_titanium__ftixjyyve6qi_large_2x.jpg",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "điện thoại",
+      "dien thoai",
+      "smartphone"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 4,
+    "name": "Apple iPhone 16 Pro Max",
+    "category": "phone",
+    "color": "natural titanium",
+    "price": 1199,
+    "stock": 6,
+    "embedding": [
+      0.93,
+      0.11,
+      0.09
+    ],
+    "image": "catalog/apple-iphone-16-pro-max-natural-titanium.jpg",
+    "source_url": "https://support.apple.com/en-us/121032",
+    "image_source_url": "https://www.apple.com/v/iphone/compare/am/images/overview/compare_iphone16_pro_max_natural_titanium__finz5cbww0mm_large_2x.jpg",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "điện thoại",
+      "dien thoai",
+      "smartphone"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 5,
+    "name": "Apple iPhone 16e",
+    "category": "phone",
+    "color": "white",
+    "price": 599,
+    "stock": 14,
+    "embedding": [
+      0.9,
+      0.08,
+      0.12
+    ],
+    "image": "catalog/apple-iphone-16e-white.jpg",
+    "source_url": "https://support.apple.com/en-us/122208",
+    "image_source_url": "https://www.apple.com/v/iphone/compare/am/images/overview/compare_iphone16e_white__qfwztyphaj2u_large_2x.jpg",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "điện thoại",
+      "dien thoai",
+      "smartphone"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 6,
+    "name": "Apple iPad (A16)",
+    "category": "tablet",
+    "color": "blue",
+    "price": 349,
+    "stock": 10,
+    "embedding": [
+      0.65,
+      0.7,
+      0.1
+    ],
+    "image": "catalog/apple-ipad-a16-lineup.png",
+    "source_url": "https://support.apple.com/en-us/122240",
+    "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/122240-ipad-a16.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "máy tính bảng",
+      "may tinh bang",
+      "tablet"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true,
+    "image_note": "Official manufacturer color/size lineup; the catalog entry selects one variant."
+  },
+  {
+    "id": 7,
+    "name": "Apple iPad mini (A17 Pro)",
+    "category": "tablet",
+    "color": "starlight",
+    "price": 499,
+    "stock": 8,
+    "embedding": [
+      0.63,
+      0.73,
+      0.11
+    ],
+    "image": "catalog/apple-ipad-mini-a17-pro-lineup.png",
+    "source_url": "https://support.apple.com/en-us/121456",
+    "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/iPad_mini_A17_Pro_Wi-Fi_Lineup_Print__USEN.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "máy tính bảng",
+      "may tinh bang",
+      "tablet"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 8,
+    "name": "Apple iPad Air 11-inch (M3)",
+    "category": "tablet",
+    "color": "blue",
+    "price": 599,
+    "stock": 11,
+    "embedding": [
+      0.67,
+      0.71,
+      0.09
+    ],
+    "image": "catalog/apple-ipad-air-11-inch-m3-lineup.png",
+    "source_url": "https://support.apple.com/en-us/122241",
+    "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/122241-122242-ipad-air-11inch-13inch-m3.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "máy tính bảng",
+      "may tinh bang",
+      "tablet"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true,
+    "image_note": "Official manufacturer color/size lineup; the catalog entry selects one variant."
+  },
+  {
+    "id": 9,
+    "name": "Apple iPad Air 13-inch (M3)",
+    "category": "tablet",
+    "color": "starlight",
+    "price": 799,
+    "stock": 5,
+    "embedding": [
+      0.61,
+      0.76,
+      0.12
+    ],
+    "image": "catalog/apple-ipad-air-13-inch-m3-lineup.png",
+    "source_url": "https://support.apple.com/en-us/122242",
+    "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/122241-122242-ipad-air-11inch-13inch-m3.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "máy tính bảng",
+      "may tinh bang",
+      "tablet"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true,
+    "image_note": "Official manufacturer color/size lineup; the catalog entry selects one variant."
+  },
+  {
+    "id": 10,
+    "name": "Apple iPad Pro 11-inch (M4)",
+    "category": "tablet",
+    "color": "space black",
+    "price": 999,
+    "stock": 4,
+    "embedding": [
+      0.64,
+      0.74,
+      0.14
+    ],
+    "image": "catalog/apple-ipad-pro-11-inch-m4-lineup.png",
+    "source_url": "https://support.apple.com/en-us/119892",
+    "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/ipad-pro-11-inch-13-inch.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "máy tính bảng",
+      "may tinh bang",
+      "tablet"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true,
+    "image_note": "Official manufacturer color/size lineup; the catalog entry selects one variant."
+  },
+  {
+    "id": 11,
+    "name": "Apple MacBook Air 13-inch M4 (2025)",
+    "category": "laptop",
+    "color": "sky blue",
+    "price": 1049,
+    "stock": 8,
+    "embedding": [
+      0.1,
+      0.95,
+      0.1
+    ],
+    "image": "catalog/apple-macbook-air-13-m4-lineup.png",
+    "source_url": "https://support.apple.com/en-us/122209",
+    "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-air/2025-macbook-air-13in-colors.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "laptop",
+      "notebook",
+      "computer"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true,
+    "image_note": "Official 13-inch M4 model color lineup; catalog record selects sky blue."
+  },
+  {
+    "id": 12,
+    "name": "Apple MacBook Air 15-inch M4 (2025)",
+    "category": "laptop",
+    "color": "midnight",
+    "price": 1249,
+    "stock": 5,
+    "embedding": [
+      0.12,
+      0.94,
+      0.08
+    ],
+    "image": "catalog/apple-macbook-air-15-m4-lineup.png",
+    "source_url": "https://support.apple.com/en-us/122210",
+    "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-air/2025-macbook-air-15in-colors.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "laptop",
+      "notebook",
+      "computer"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true,
+    "image_note": "Official 15-inch M4 model color lineup; catalog record selects midnight."
+  },
+  {
+    "id": 13,
+    "name": "Apple MacBook Pro 14-inch M4 (2024)",
+    "category": "laptop",
+    "color": "space black",
+    "price": 1649,
+    "stock": 6,
+    "embedding": [
+      0.08,
+      0.96,
+      0.12
+    ],
+    "image": "catalog/apple-macbook-pro-14-m4-space-black.jpg",
+    "source_url": "https://support.apple.com/en-us/121552",
+    "image_source_url": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spaceblack-select-202410?wid=1200&hei=1200&fmt=jpeg&qlt=90",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "laptop",
+      "notebook",
+      "computer"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 14,
+    "name": "Apple MacBook Pro 16-inch M4 Pro (2024)",
+    "category": "laptop",
+    "color": "silver",
+    "price": 2549,
+    "stock": 3,
+    "embedding": [
+      0.14,
+      0.93,
+      0.1
+    ],
+    "image": "catalog/apple-macbook-pro-16-m4-pro-silver.jpg",
+    "source_url": "https://support.apple.com/en-us/121554",
+    "image_source_url": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp16-silver-select-202410?wid=1200&hei=1200&fmt=jpeg&qlt=90",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "laptop",
+      "notebook",
+      "computer"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 15,
+    "name": "ASUS Zenbook 14 OLED UX3405",
+    "category": "laptop",
+    "color": "ponder blue",
+    "price": 1199,
+    "stock": 0,
+    "embedding": [
+      0.06,
+      0.95,
+      0.14
+    ],
+    "image": "catalog/asus-zenbook-14-oled-ux3405-ponder-blue.png",
+    "source_url": "https://www.asus.com/laptops/for-home/zenbook/asus-zenbook-14-oled-ux3405/",
+    "image_source_url": "https://dlcdnwebimgs.asus.com/gain/caf912a5-5bc2-4a81-ac8f-6339e488f549/w800",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "laptop",
+      "notebook",
+      "computer"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 16,
+    "name": "Logitech MX Master 3S Bluetooth Edition Mouse",
+    "category": "accessory",
+    "color": "black",
+    "price": 95,
+    "stock": 11,
+    "embedding": [
+      0.1,
+      0.2,
+      0.95
+    ],
+    "image": "catalog/logitech-mx-master-3s-bluetooth-black.png",
+    "source_url": "https://www.logitech.com/en-us/shop/p/mx-master-3s",
+    "image_source_url": "https://resource.logitech.com/content/dam/logitech/en/products/mice/mx-master-3s/2025-update/mx-master-3s-bluetooth-edition-top-view-black-new-1.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "phụ kiện",
+      "phu kien",
+      "accessories",
+      "chuột",
+      "chuot",
+      "mouse"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 17,
+    "name": "Logitech G502 HERO Gaming Mouse",
+    "category": "accessory",
+    "color": "black",
+    "price": 55,
+    "stock": 18,
+    "embedding": [
+      0.14,
+      0.18,
+      0.94
+    ],
+    "image": "catalog/logitech-g502-hero-black.png",
+    "source_url": "https://www.logitechg.com/en-us/shop/p/g502-hero-gaming-mouse",
+    "image_source_url": "https://resource.logitechg.com/content/dam/gaming/en/non-braid/hyjal-g502-hero/2025/g502-hero-mouse-top-angle-gallery-1.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "phụ kiện",
+      "phu kien",
+      "accessories",
+      "chuột",
+      "chuot",
+      "mouse"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 18,
+    "name": "Logitech Pebble Mouse 2 M350s",
+    "category": "accessory",
+    "color": "tonal rose",
+    "price": 29,
+    "stock": 15,
+    "embedding": [
+      0.07,
+      0.22,
+      0.96
+    ],
+    "image": "catalog/logitech-pebble-mouse-2-m350s-tonal-rose.png",
+    "source_url": "https://www.logitech.com/en-us/shop/p/pebble-2-m350s-wireless-mouse",
+    "image_source_url": "https://resource.logitech.com/content/dam/logitech/en/products/mice/pebble-mouse-2-m350s/2026-refresh/gallery/pebble-mouse-2-m350s-tonal-rose-top-angle-gallery-1.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "phụ kiện",
+      "phu kien",
+      "accessories",
+      "chuột",
+      "chuot",
+      "mouse"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 19,
+    "name": "Logitech MX Keys S Wireless Keyboard",
+    "category": "accessory",
+    "color": "graphite",
+    "price": 115,
+    "stock": 7,
+    "embedding": [
+      0.12,
+      0.25,
+      0.93
+    ],
+    "image": "catalog/logitech-mx-keys-s-graphite-us.png",
+    "source_url": "https://www.logitech.com/en-us/shop/p/mx-keys-s",
+    "image_source_url": "https://resource.logitech.com/content/dam/logitech/en/products/keyboards/mx-keys-s/migration-assets-for-delorean-2025/gallery/mx-keys-s-top-view-graphite-us.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "phụ kiện",
+      "phu kien",
+      "accessories",
+      "bàn phím",
+      "ban phim",
+      "keyboard"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  },
+  {
+    "id": 20,
+    "name": "Logitech Pebble Keys 2 K380s Keyboard",
+    "category": "accessory",
+    "color": "tonal graphite",
+    "price": 39,
+    "stock": 0,
+    "embedding": [
+      0.08,
+      0.16,
+      0.97
+    ],
+    "image": "catalog/logitech-pebble-keys-2-k380s-tonal-graphite.png",
+    "source_url": "https://www.logitech.com/en-us/shop/p/pebble-keys-2",
+    "image_source_url": "https://resource.logitech.com/content/dam/logitech/en/products/keyboards/pebble-keys-2-k380s/2026/gallery/tonal-graphite/pebble-keys-k380s-2-tonal-graphite-top-angle-gallery-1.png",
+    "image_source": "official manufacturer product image",
+    "price_is_demo": true,
+    "search_terms": [
+      "phụ kiện",
+      "phu kien",
+      "accessories",
+      "bàn phím",
+      "ban phim",
+      "keyboard"
+    ],
+    "stock_is_demo": true,
+    "embedding_is_artificial": true
+  }
 ]

@@ -5,11 +5,9 @@
   const button = document.getElementById('search-exec-btn');
   const results = document.getElementById('text-results');
   const status = document.getElementById('text-status');
-  const stockButton = document.getElementById('in-stock-filter');
   const limit = document.getElementById('text-top-k');
   const chips = [...document.querySelectorAll('[data-category]')];
   let category = null;
-  let inStock = false;
   let requestNumber = 0;
 
   function updateFilters() {
@@ -19,11 +17,6 @@
       ['bg-primary', 'text-on-primary', 'active-filter', 'font-medium', 'shadow-xs'].forEach(name => chip.classList.toggle(name, active));
       ['bg-surface-container', 'text-on-surface-variant'].forEach(name => chip.classList.toggle(name, !active));
     });
-    stockButton.setAttribute('aria-pressed', String(inStock));
-    stockButton.classList.toggle('bg-secondary-container/60', inStock);
-    stockButton.classList.toggle('text-secondary', inStock);
-    stockButton.classList.toggle('bg-surface-container', !inStock);
-    stockButton.classList.toggle('text-on-surface-variant', !inStock);
   }
 
   function resetMetrics(label = 'No search yet') {
@@ -36,6 +29,7 @@
   async function search() {
     const currentRequest = ++requestNumber;
     const query = input.value;
+    const browseCatalog = !query.trim();
     results.replaceChildren();
     results.setAttribute('aria-busy', 'true');
     resetMetrics('Searching…');
@@ -43,20 +37,24 @@
     Catalog.setStatus(status, 'Searching the local catalog…');
     try {
       const response = await Catalog.search({
-        type: 'text', query,
+        type: 'text', query, browse_catalog: browseCatalog,
         top_k: limit.value ? Number(limit.value) : null,
-        filters: {category, in_stock: inStock}
+        filters: {category}
       });
       if (currentRequest !== requestNumber) return;
       Catalog.renderProducts(results, response.results, {
-        scoreLabel: 'Keyword score', onDetails: (product, score) => Catalog.showProduct(product, score)
+        scoreLabel: 'Keyword score', hideScore: browseCatalog,
+        onDetails: (product, score) => Catalog.showProduct(product, browseCatalog ? undefined : score)
       });
-      document.getElementById('text-query-summary').textContent = `(${response.query.query || 'empty query'})`;
+      document.getElementById('text-query-summary').textContent = browseCatalog
+        ? (category ? `Catalog: ${chips.find(chip => chip.dataset.category === category).textContent}` : 'All catalog products')
+        : `(${response.query.query})`;
       document.getElementById('text-candidates').textContent = `${response.candidate_count} Products`;
       document.getElementById('text-count').textContent = `${response.returned_count} shown · ${response.filtered_count} matches`;
       document.getElementById('text-latency').textContent = `Search: ${Number(response.duration_ms).toFixed(2)} ms`;
       Catalog.setStatus(status, response.results.length
-        ? `${response.filtered_count} products match your query and filters. Higher keyword scores appear first.`
+        ? (browseCatalog ? `${response.filtered_count} products in the selected catalog. No keyword filter applied.`
+          : `${response.filtered_count} products match your query and filters. Higher keyword scores appear first.`)
         : 'No products match this query and the selected filters. Try another keyword or All Categories.');
     } catch (error) {
       if (currentRequest !== requestNumber) return;
@@ -82,9 +80,8 @@
   }
 
   function preset() {
-    input.value = 'black shoes';
+    input.value = 'phone';
     category = null;
-    inStock = false;
     limit.value = '';
     updateFilters();
     search();
@@ -103,20 +100,16 @@
     Catalog.setStatus(status, 'Query edited. Select Search or press Enter to refresh results.');
   });
   document.getElementById('clear-search-btn').addEventListener('click', clear);
-  document.getElementById('quick-demo-btn').addEventListener('click', preset);
   document.getElementById('text-preset-btn').addEventListener('click', preset);
   document.getElementById('text-voice-link').addEventListener('click', () => { window.location.href = '/voice-search'; });
   document.getElementById('text-image-link').addEventListener('click', () => { window.location.href = '/image-search'; });
   chips.forEach(chip => chip.addEventListener('click', () => {
     category = chip.dataset.category || null;
+    input.value = '';
+    limit.value = '';
     updateFilters();
     search();
   }));
-  stockButton.addEventListener('click', () => {
-    inStock = !inStock;
-    updateFilters();
-    search();
-  });
   limit.addEventListener('change', search);
   updateFilters();
   search();

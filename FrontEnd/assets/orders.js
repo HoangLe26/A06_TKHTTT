@@ -70,9 +70,9 @@
 
     const items = order.items.map((item, index) => {
       const product = item.product;
-      const image = product.image_url && product.image_url.startsWith("/product-images/") ? product.image_url : "/product-images/shoe.svg";
+      const image = product.image_url && product.image_url.startsWith("/product-images/") ? product.image_url : "";
       return `<div class="bg-surface-container-low/60 border border-outline-variant/30 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div class="flex items-center gap-4"><img class="w-16 h-16 rounded-xl object-contain border border-outline-variant/30 bg-surface-container" src="${escape(image)}" alt="${escape(product.name)}"><div><h3 class="font-headline-sm font-serif text-headline-sm">${escape(product.name)}</h3><p class="font-label-sm text-on-surface-variant">${escape(product.category)} · ${escape(product.color)} · Product #${escape(product.id)}</p><p class="font-label-sm text-on-surface-variant">Unit price: ${money(item.unit_price)}</p></div></div>
+      <div class="flex items-center gap-4"><img class="w-16 h-16 rounded-xl object-contain border border-outline-variant/30 bg-surface-container" src="${escape(image)}" alt="${escape(product.name)}"><div><h3 class="font-headline-sm font-serif text-headline-sm">${escape(product.name)}</h3><p class="font-label-sm text-on-surface-variant">Product #${escape(product.id)}</p><p class="font-label-sm text-on-surface-variant">Unit price: ${money(item.unit_price)}</p></div></div>
       <div class="flex items-center justify-between gap-4"><div class="sm:text-right"><span class="font-label-sm text-on-surface-variant">Qty: ${item.quantity}</span><p class="font-headline-sm font-serif">${money(item.quantity * item.unit_price)}</p></div><button type="button" data-product-index="${index}" class="px-space-sm py-space-xs rounded-lg bg-surface-container border border-outline-variant/30 font-label-sm">View Details</button></div></div>`;
     }).join("");
 

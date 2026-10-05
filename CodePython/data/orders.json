@@ -1,41 +1,122 @@
 [
   {
-    "id": "O001", "customer_id": "C001", "customer_name": "Demo Customer A",
-    "date": "2026-10-01", "status": "Shipped",
-    "shipping_address": "Sample delivery address A (demo data)",
+    "id": "O001",
+    "customer_id": "C001",
+    "customer_name": "Sample Customer A",
+    "date": "2026-10-01",
+    "status": "Shipped",
+    "shipping_address": "Sample delivery address A (sample data)",
     "payment_method": "Simulated payment — no transaction",
-    "shipping": 5, "tax": 0,
-    "items": [{"product_id": 1, "quantity": 1, "unit_price": 120}, {"product_id": 10, "quantity": 2, "unit_price": 25}],
+    "shipping": 5,
+    "tax": 0,
+    "items": [
+      {
+        "product_id": 1,
+        "quantity": 1,
+        "unit_price": 799
+      },
+      {
+        "product_id": 16,
+        "quantity": 2,
+        "unit_price": 95
+      }
+    ],
     "tracking_events": [
-      {"label": "Order placed", "date": "2026-10-01", "completed": true},
-      {"label": "Dispatched", "date": "2026-10-02", "completed": true},
-      {"label": "Delivered", "date": "Pending", "completed": false}
+      {
+        "label": "Order placed",
+        "date": "2026-10-01",
+        "completed": true
+      },
+      {
+        "label": "Dispatched",
+        "date": "2026-10-02",
+        "completed": true
+      },
+      {
+        "label": "Delivered",
+        "date": "Pending",
+        "completed": false
+      }
     ]
   },
   {
-    "id": "O002", "customer_id": "C002", "customer_name": "Demo Customer B",
-    "date": "2026-09-30", "status": "Delivered",
-    "shipping_address": "Sample delivery address B (demo data)",
+    "id": "O002",
+    "customer_id": "C002",
+    "customer_name": "Sample Customer B",
+    "date": "2026-09-30",
+    "status": "Delivered",
+    "shipping_address": "Sample delivery address B (sample data)",
     "payment_method": "Simulated payment — no transaction",
-    "shipping": 0, "tax": 0,
-    "items": [{"product_id": 3, "quantity": 1, "unit_price": 80}, {"product_id": 8, "quantity": 1, "unit_price": 55}],
+    "shipping": 0,
+    "tax": 0,
+    "items": [
+      {
+        "product_id": 6,
+        "quantity": 1,
+        "unit_price": 349
+      },
+      {
+        "product_id": 19,
+        "quantity": 1,
+        "unit_price": 115
+      }
+    ],
     "tracking_events": [
-      {"label": "Order placed", "date": "2026-09-30", "completed": true},
-      {"label": "Dispatched", "date": "2026-10-01", "completed": true},
-      {"label": "Delivered", "date": "2026-10-03", "completed": true}
+      {
+        "label": "Order placed",
+        "date": "2026-09-30",
+        "completed": true
+      },
+      {
+        "label": "Dispatched",
+        "date": "2026-10-01",
+        "completed": true
+      },
+      {
+        "label": "Delivered",
+        "date": "2026-10-03",
+        "completed": true
+      }
     ]
   },
   {
-    "id": "O003", "customer_id": "C001", "customer_name": "Demo Customer A",
-    "date": "2026-10-05", "status": "Processing",
-    "shipping_address": "Sample delivery address A (demo data)",
+    "id": "O003",
+    "customer_id": "C001",
+    "customer_name": "Sample Customer A",
+    "date": "2026-10-05",
+    "status": "Processing",
+    "shipping_address": "Sample delivery address A (sample data)",
     "payment_method": "Simulated payment — no transaction",
-    "shipping": 5, "tax": 0,
-    "items": [{"product_id": 6, "quantity": 2, "unit_price": 35}],
+    "shipping": 5,
+    "tax": 0,
+    "items": [
+      {
+        "product_id": 11,
+        "quantity": 1,
+        "unit_price": 1049
+      },
+      {
+        "product_id": 17,
+        "quantity": 1,
+        "unit_price": 55
+      }
+    ],
     "tracking_events": [
-      {"label": "Order placed", "date": "2026-10-05", "completed": true},
-      {"label": "Dispatched", "date": "Pending", "completed": false},
-      {"label": "Delivered", "date": "Pending", "completed": false}
+      {
+        "label": "Order placed",
+        "date": "2026-10-05",
+        "completed": true
+      },
+      {
+        "label": "Dispatched",
+        "date": "Pending",
+        "completed": false
+      },
+      {
+        "label": "Delivered",
+        "date": "Pending",
+        "completed": false
+      }
     ]
   }
 ]

@@ -58,6 +58,9 @@ class ProductRepository:
         stock = product.get("stock")
         if not isinstance(stock, int) or isinstance(stock, bool) or stock < 0:
             raise ValueError(f"{prefix}: stock must be a nonnegative integer.")
+        terms = product.get('search_terms', [])
+        if not isinstance(terms, list) or any(not isinstance(term, str) for term in terms):
+            raise ValueError(f"{prefix}: search_terms must be a list of strings.")
 
     def all_products(self):
         """Return independent records so callers cannot alter the catalogue."""

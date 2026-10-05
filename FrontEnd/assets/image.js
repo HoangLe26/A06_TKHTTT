@@ -2,11 +2,7 @@
 
 (() => {
   const $ = (id) => document.getElementById(id);
-  const presets = {
-    shoe: { vector: [0.95, 0.10, 0.15], image: "/product-images/shoe.svg", label: "Black shoes" },
-    bag: { vector: [0.12, 0.20, 0.93], image: "/product-images/bag.svg", label: "Leather bag" },
-    shirt: { vector: [0.20, 0.90, 0.15], image: "/product-images/shirt.svg", label: "Red T-Shirt" }
-  };
+  const presets = {};
   let previewURL = null;
   let requestVersion = 0;
   let dimension = 3;
@@ -41,8 +37,8 @@
     releasePreview();
     $("file-input").value = "";
     $("query-preview-img").src = preset.image;
-    $("query-preview-img").alt = `Illustration for the ${preset.label} preset`;
-    $("query-file-label").textContent = `${preset.label} · preset illustration`;
+    $("query-preview-img").alt = `Manufacturer product image of ${preset.label}`;
+    $("query-file-label").textContent = `${preset.label} · real product image`;
     $("image-embedding").value = preset.vector.join(", ");
     $("embedding-state").textContent = "PRESET VECTOR READY";
     document.querySelectorAll("[data-preset]").forEach((button) => {
@@ -193,9 +189,19 @@
       dimension = data.vector_dimension || 3;
       data.categories.forEach((category) => {
         const option = document.createElement("option");
-        option.value = category; option.textContent = category;
+        option.value = category; option.textContent = Catalog.categoryLabel(category);
         $("image-category").append(option);
       });
+      document.querySelectorAll("[data-preset]").forEach((button) => {
+        const key = button.dataset.preset;
+        const product = data.products.find((item) => item.category === key);
+        button.disabled = !product;
+        if (product) {
+          presets[key] = { vector: product.embedding, image: product.image_url, label: product.name };
+          button.textContent = `${Catalog.categoryLabel(key)}: ${product.name}`;
+        }
+      });
+      selectPreset('phone');
       await search();
     } catch (error) {
       status(error.message || "Unable to load the catalogue. Start the Python web server.", true);

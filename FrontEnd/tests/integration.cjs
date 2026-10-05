@@ -4,6 +4,9 @@ const { JSDOM, ResourceLoader, VirtualConsole } = require('jsdom');
 const base = process.env.SEARCH_BASE_URL || 'http://127.0.0.1:8000';
 const baseOrigin = new URL(base).origin;
 let checks = 0;
+let catalog, orders;
+const product = id => catalog.products.find(item => item.id === id);
+const amount = value => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 
 class LocalResources extends ResourceLoader {
   fetch(url, options) {
@@ -49,7 +52,7 @@ async function page(route) {
       window.print = () => { window.printCount++; };
     },
   });
-  await waitFor(() => dom.window.Catalog && dom.window.document.querySelector('#catalog-connection')?.textContent.includes('Connected'), 'local connection');
+  await waitFor(() => dom.window.Catalog && dom.window.document.querySelector('.catalog-mobile-nav'), 'application shell');
   return { dom, window: dom.window, document: dom.window.document, errors, requests };
 }
 
@@ -62,31 +65,128 @@ function edit(p, id, value, eventName = 'input') {
 const cards = (p, id) => [...p.document.querySelectorAll(`#${id} .catalog-result-card`)];
 const text = (p, id) => p.document.getElementById(id).textContent;
 const submit = (p, id) => p.document.getElementById(id).dispatchEvent(new p.window.Event('submit', { bubbles: true, cancelable: true }));
+const englishCategories = { phone: 'Phones', tablet: 'Tablets', laptop: 'Laptops', accessory: 'Accessories' };
+
+function checkEnglishUI(p, mode) {
+  check(`${mode} interface and category labels are English`, () => {
+    assert.equal(p.document.documentElement.lang, 'en');
+    const vietnameseLetters = /[\u00c0-\u024f\u1e00-\u1eff]/u;
+    assert.doesNotMatch(p.document.body.textContent, vietnameseLetters);
+    for (const node of p.document.querySelectorAll('[aria-label], [placeholder], [title], img[alt]')) {
+      for (const attribute of ['aria-label', 'placeholder', 'title', 'alt']) {
+        assert.doesNotMatch(node.getAttribute(attribute) || '', vietnameseLetters);
+      }
+    }
+    for (const [category, label] of Object.entries(englishCategories)) {
+      const control = p.document.querySelector(`[data-category="${category}"], option[value="${category}"]`);
+      if (control) assert.equal(control.textContent.trim(), label);
+      const preset = p.document.querySelector(`[data-preset="${category}"]`);
+      if (preset) assert.ok(preset.textContent.startsWith(label + ':'));
+    }
+  });
+}
+
+function checkRemovedIntro(p, mode) {
+  check(`${mode} has no removed demo intro or connection banner`, () => {
+    assert.equal(p.document.getElementById('catalog-connection'), null);
+    assert.equal(p.document.getElementById('quick-demo-btn'), null);
+    assert.doesNotMatch(p.document.body.textContent,
+      /Demo 1: Text|Demo 1: Keyword Matching|auto_fix_high|Demo 2: Active|Simulated speech-to-text\s*·?\s*enter your transcript below|Demo 03 \/ Image Similarity|Visual Similarity & Artificial Embedding Search|Connected\s*·\s*20 products/);
+    assert.equal(p.document.querySelectorAll('.catalog-mobile-nav a').length, 4);
+    if (mode === 'Text') {
+      assert.ok(p.document.getElementById('text-preset-btn'));
+      assert.match(p.document.body.textContent, /Keyword Retrieval:.*Active/s);
+      assert.match(p.document.body.textContent, /One Point per Matching Keyword/);
+    } else if (mode === 'Voice') {
+      assert.ok(p.document.getElementById('voice-banner-latency'));
+      assert.match(p.document.body.textContent, /Transcript Simulation · No Microphone/);
+    } else if (mode === 'Image') {
+      assert.match(p.document.body.textContent, /Artificial vectors · NumPy cosine similarity · 3 dimensions/);
+    }
+  });
+}
+
+function checkCleanProductLabels(p, mode, resultsId) {
+  check(`${mode} has no Demo text or category/color labels on product cards`, () => {
+    assert.doesNotMatch(p.document.body.textContent, /\bdemo\b/i);
+    for (const node of p.document.querySelectorAll('[aria-label], [placeholder], [title], img[alt]')) {
+      for (const attribute of ['aria-label', 'placeholder', 'title', 'alt']) {
+        assert.doesNotMatch(node.getAttribute(attribute) || '', /\bdemo\b/i);
+      }
+    }
+    if (resultsId) {
+      for (const card of cards(p, resultsId)) {
+        const item = catalog.products.find(item => item.name === card.querySelector('h3').textContent);
+        assert.ok(item);
+        assert.ok(!card.textContent.includes(`${englishCategories[item.category]} · ${item.color}`));
+      }
+    } else {
+      for (const button of p.document.querySelectorAll('[data-product-index]')) {
+        const row = button.parentElement.parentElement;
+        const item = catalog.products.find(item => item.name === row.querySelector('h3').textContent);
+        assert.ok(item);
+        assert.ok(!row.textContent.includes(`${item.category} · ${item.color}`));
+      }
+    }
+  });
+}
 
 async function testText() {
   const p = await page('/text-search');
   try {
-    await waitFor(() => cards(p, 'text-results').length === 8, 'default text results');
-    check('Text default results come from the 10-product catalogue', () => assert.match(cards(p, 'text-results')[0].textContent, /Nike Running Shoes.*2\.0000|2\.0000.*Nike Running Shoes/s));
+    await waitFor(() => cards(p, 'text-results').length === 5, 'default text results');
+    checkEnglishUI(p, 'Text');
+    checkRemovedIntro(p, 'Text');
+    checkCleanProductLabels(p, 'Text', 'text-results');
+    check('Text default results come from the 20-product catalogue', () => assert.ok(cards(p, 'text-results')[0].textContent.includes(product(1).name)));
     check('Navigation links resolve to the four application routes', () => {
       for (const link of p.document.querySelectorAll('a[data-path]')) assert.equal(link.pathname, '/' + link.dataset.path);
     });
-    p.document.querySelector('[data-category="shoes"]').click();
-    await waitFor(() => cards(p, 'text-results').length === 5, 'shoe filter');
-    check('Text category filter fetches and limits real candidates', () => assert.equal(cards(p, 'text-results').length, 5));
+    for (const category of ['tablet', 'laptop', 'accessory', '', 'phone']) {
+      edit(p, 'search-input', 'phone');
+      p.document.getElementById('text-top-k').value = '3';
+      p.document.querySelector(`[data-category="${category}"]`).click();
+      const expected = catalog.products.filter(item => !category || item.category === category);
+      await waitFor(() => !p.document.getElementById('search-exec-btn').disabled
+        && cards(p, 'text-results').length === expected.length, `browse ${category || 'all'}`);
+      check(`Category ${category || 'All Categories'} shows its actual products despite the old keyword`, () => {
+        assert.deepEqual(cards(p, 'text-results').map(card => card.querySelector('h3').textContent), expected.map(item => item.name));
+        assert.equal(p.document.getElementById('search-input').value, '');
+        assert.equal(p.document.getElementById('text-top-k').value, '');
+        const payload = JSON.parse(p.requests.filter(r => r.path === '/api/search').at(-1).options.body);
+        assert.equal(payload.browse_catalog, true);
+        assert.equal(payload.query, '');
+        assert.equal(payload.filters.category, category || null);
+        assert.doesNotMatch(cards(p, 'text-results')[0].textContent, /Keyword score/);
+      });
+    }
+    edit(p, 'search-input', 'iphone');
+    p.document.getElementById('search-exec-btn').click();
+    await waitFor(() => !p.document.getElementById('search-exec-btn').disabled
+      && cards(p, 'text-results')[0]?.textContent.includes('Keyword score'), 'keyword search after browsing');
+    check('Typing a keyword after browsing still searches within the selected category', () => {
+      assert.equal(cards(p, 'text-results').length, 5);
+      const payload = JSON.parse(p.requests.filter(r => r.path === '/api/search').at(-1).options.body);
+      assert.equal(payload.browse_catalog, false);
+      assert.equal(payload.filters.category, 'phone');
+    });
     edit(p, 'text-top-k', '3', 'change');
     await waitFor(() => cards(p, 'text-results').length === 3, 'text top-k');
     check('Text top-k truncates after ranking', () => assert.match(text(p, 'text-count'), /3 shown/));
-    p.document.getElementById('in-stock-filter').click();
-    await waitFor(() => !p.document.getElementById('search-exec-btn').disabled, 'stock filter');
-    check('Stock filter is included in the request', () => {
+    check('Text stock-only control is removed and does not silently filter products', () => {
+      assert.equal(p.document.getElementById('in-stock-filter'), null);
+      const facets = p.document.querySelector('[data-category="phone"]').parentElement;
+      assert.doesNotMatch(facets.textContent, /In Stock Only|check_circle/);
       const payload = JSON.parse(p.requests.filter(r => r.path === '/api/search').at(-1).options.body);
-      assert.equal(payload.filters.in_stock, true);
+      assert.equal(payload.filters.in_stock, undefined);
     });
     p.document.querySelector('#text-results .catalog-button').click();
     check('Text product detail dialog uses actual metadata', () => {
-      assert.match(text(p, 'catalog-product-dialog'), /Nike Running Shoes/);
-      assert.match(text(p, 'catalog-product-dialog'), /Stock: 10/);
+      assert.ok(text(p, 'catalog-product-dialog').includes(product(1).name));
+      assert.ok(text(p, 'catalog-product-dialog').includes(`Stock: ${product(1).stock}`));
+      assert.doesNotMatch(text(p, 'catalog-product-dialog'), /\bdemo\b/i);
+      assert.equal(p.document.querySelector('#catalog-product-dialog a').href, product(1).source_url);
+      assert.ok(text(p, 'catalog-product-dialog').includes('Category: Phones'));
     });
     p.document.querySelector('#catalog-product-dialog button').click();
     edit(p, 'search-input', 'zzznomatchingproductzzz');
@@ -102,8 +202,8 @@ async function testText() {
       assert.equal(p.document.getElementById('search-input').value, '');
       assert.equal(cards(p, 'text-results').length, 0);
     });
-    p.document.getElementById('quick-demo-btn').click();
-    await waitFor(() => cards(p, 'text-results').length === 8, 'preset reset');
+    p.document.getElementById('text-preset-btn').click();
+    await waitFor(() => cards(p, 'text-results').length === 5, 'preset reset');
     check('Preset resets filters and reloads the real demo', () => assert.equal(p.document.getElementById('text-top-k').value, ''));
     p.window.fetch = () => Promise.reject(new TypeError('connection lost'));
     edit(p, 'search-input', 'red');
@@ -118,14 +218,17 @@ async function testVoice() {
   const p = await page('/voice-search');
   try {
     await waitFor(() => cards(p, 'voice-results').length > 0, 'voice default');
-    check('Voice displays the identity transcription returned by Python', () => assert.equal(text(p, 'voice-transcribed'), 'find running shoes'));
-    edit(p, 'voice-input', 'find black leather bag');
+    checkEnglishUI(p, 'Voice');
+    checkRemovedIntro(p, 'Voice');
+    checkCleanProductLabels(p, 'Voice', 'voice-results');
+    check('Voice displays the identity transcription returned by Python', () => assert.equal(text(p, 'voice-transcribed'), 'find laptop'));
+    edit(p, 'voice-input', 'find tablet');
     p.document.getElementById('voice-input').dispatchEvent(new p.window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-    await waitFor(() => text(p, 'voice-transcribed') === 'find black leather bag', 'voice edit');
-    check('Editable voice query retrieves Black Leather Bag first', () => assert.match(cards(p, 'voice-results')[0].textContent, /Black Leather Bag/));
-    edit(p, 'voice-category', 'bag', 'change');
-    await waitFor(() => cards(p, 'voice-results').length === 2, 'voice category');
-    check('Voice category filter is applied by the backend', () => assert.equal(cards(p, 'voice-results').length, 2));
+    await waitFor(() => text(p, 'voice-transcribed') === 'find tablet', 'voice edit');
+    check('Editable voice query retrieves a real tablet first', () => assert.ok(cards(p, 'voice-results')[0].textContent.includes(product(6).name)));
+    edit(p, 'voice-category', 'tablet', 'change');
+    await waitFor(() => cards(p, 'voice-results').length === 5, 'voice category');
+    check('Voice category filter is applied by the backend', () => assert.equal(cards(p, 'voice-results').length, 5));
     p.document.getElementById('voice-list-btn').click();
     check('Voice grid/list toggle changes the displayed layout class', () => assert.ok(p.document.getElementById('voice-results').classList.contains('catalog-list')));
     p.document.getElementById('voice-clear-btn').click();
@@ -140,11 +243,19 @@ async function testVoice() {
 async function testImage() {
   const p = await page('/image-search');
   try {
-    await waitFor(() => cards(p, 'image-results').length === 10, 'image default');
-    check('Image preset uses the actual artificial-vector index', () => assert.match(cards(p, 'image-results')[0].textContent, /Nike Running Shoes/));
+    await waitFor(() => cards(p, 'image-results').length === 20, 'image default');
+    checkEnglishUI(p, 'Image');
+    checkRemovedIntro(p, 'Image');
+    checkCleanProductLabels(p, 'Image', 'image-results');
+    check('Image preset uses the actual artificial-vector index', () => assert.ok(cards(p, 'image-results')[0].textContent.includes(product(1).name)));
     p.document.getElementById('btn-sample-2').click();
-    await waitFor(() => cards(p, 'image-results')[0]?.textContent.includes('Black Leather Bag'), 'bag preset');
-    check('Bag preset changes the image, vector and top result', () => assert.equal(p.document.getElementById('query-preview-img').getAttribute('src'), '/product-images/bag.svg'));
+    await waitFor(() => cards(p, 'image-results')[0]?.textContent.includes(product(6).name), 'tablet preset');
+    check('Tablet preset uses its real manufacturer image', () => assert.equal(p.document.getElementById('query-preview-img').getAttribute('src'), product(6).image_url));
+    for (const [buttonId, productId] of [['btn-sample-3', 11], ['btn-sample-4', 16]]) {
+      p.document.getElementById(buttonId).click();
+      await waitFor(() => cards(p, 'image-results')[0]?.textContent.includes(product(productId).name), 'other category preset');
+      check(`Image preset ${productId} is connected to the catalogue`, () => assert.equal(p.document.getElementById('query-preview-img').getAttribute('src'), product(productId).image_url));
+    }
     edit(p, 'image-embedding', '1, 2');
     submit(p, 'image-search-form');
     check('Invalid dimension is shown without old image results', () => {
@@ -153,7 +264,7 @@ async function testImage() {
     });
     edit(p, 'image-embedding', '0, 0, 0');
     submit(p, 'image-search-form');
-    await waitFor(() => cards(p, 'image-results').length === 10, 'zero image');
+    await waitFor(() => cards(p, 'image-results').length === 20, 'zero image');
     check('Zero-vector image search returns finite zero scores', () => assert.match(cards(p, 'image-results')[0].textContent, /0\.0000/));
     edit(p, 'image-threshold', '0.99', 'change');
     submit(p, 'image-search-form');
@@ -170,9 +281,9 @@ async function testImage() {
     });
     submit(p, 'image-search-form');
     check('Custom image requires a manually supplied vector', () => assert.match(text(p, 'image-status'), /Enter the artificial vector/));
-    edit(p, 'image-embedding', '[0.12, 0.20, 0.93]');
+    edit(p, 'image-embedding', JSON.stringify(product(6).embedding));
     submit(p, 'image-search-form');
-    await waitFor(() => cards(p, 'image-results')[0]?.textContent.includes('Black Leather Bag'), 'manual custom vector');
+    await waitFor(() => cards(p, 'image-results')[0]?.textContent.includes(product(6).name), 'manual custom vector');
     check('Manual vector searches through the same cosine API', () => assert.match(cards(p, 'image-results')[0].textContent, /1\.0000/));
     Object.defineProperty(p.document.getElementById('file-input'), 'files', { configurable: true, value: [{ name: 'large.png', type: 'image/png', size: 13 * 1024 * 1024 }] });
     p.document.getElementById('file-input').dispatchEvent(new p.window.Event('change'));
@@ -185,20 +296,23 @@ async function testOrders() {
   const p = await page('/order-search');
   try {
     await waitFor(() => text(p, 'order-status').includes('Retrieved order'), 'default order');
+    checkEnglishUI(p, 'Order');
+    checkRemovedIntro(p, 'Order');
+    checkCleanProductLabels(p, 'Order');
     check('O001 details use actual items and computed total', () => {
-      assert.match(text(p, 'order-details'), /Nike Running Shoes/);
-      assert.match(text(p, 'order-details'), /\$175\.00/);
+      assert.ok(text(p, 'order-details').includes(product(1).name));
+      assert.ok(text(p, 'order-details').includes(amount(orders[0].total)));
     });
     p.document.querySelector('[data-order-id="O002"]').click();
     await waitFor(() => text(p, 'order-status').includes('#O002'), 'second order');
     check('Quick order lookup changes status, items and total', () => {
-      assert.match(text(p, 'order-details'), /Black Leather Bag/);
-      assert.match(text(p, 'order-details'), /\$135\.00/);
+      assert.ok(text(p, 'order-details').includes(product(6).name));
+      assert.ok(text(p, 'order-details').includes(amount(orders[1].total)));
       assert.match(text(p, 'order-status'), /Delivered/);
     });
     p.document.querySelector('[data-product-index]').click();
     check('Order product details omit an invented ranking score', () => {
-      assert.match(text(p, 'catalog-product-dialog'), /Black Leather Bag/);
+      assert.ok(text(p, 'catalog-product-dialog').includes(product(6).name));
       assert.doesNotMatch(text(p, 'catalog-product-dialog'), /NaN|Ranking score/);
     });
     p.document.querySelector('#catalog-product-dialog button').click();
@@ -207,19 +321,34 @@ async function testOrders() {
     edit(p, 'order-id-input', 'UNKNOWN');
     submit(p, 'order-search-form');
     await waitFor(() => text(p, 'order-status').includes('not found'), 'unknown order');
-    check('Unknown order clears the previous details', () => assert.doesNotMatch(text(p, 'order-details'), /Black Leather Bag|\$135/));
+    check('Unknown order clears the previous details', () => assert.ok(!text(p, 'order-details').includes(product(6).name)));
     p.document.getElementById('order-reset').click();
     check('Order reset clears the input and selected record', () => assert.equal(p.document.getElementById('order-id-input').value, ''));
     edit(p, 'order-id-input', 'o003');
     submit(p, 'order-search-form');
     await waitFor(() => text(p, 'order-status').includes('#O003'), 'third order');
-    check('Case-insensitive order lookup computes the third total', () => assert.match(text(p, 'order-details'), /\$75\.00/));
+    check('Case-insensitive order lookup computes the third total', () => assert.ok(text(p, 'order-details').includes(amount(orders[2].total))));
     check('Unsupported purchase actions are visibly disabled', () => assert.ok(p.document.querySelector('#order-details button[disabled]')));
     assert.deepEqual(p.errors, []);
   } finally { p.window.close(); }
 }
 
 (async () => {
+  catalog = await (await fetch(base + '/api/catalog')).json();
+  orders = await Promise.all(['O001', 'O002', 'O003'].map(async id => (await (await fetch(base + '/api/orders/' + id)).json()).order));
+  check('Catalogue contains five products in each of the four groups', () => {
+    assert.equal(catalog.products.length, 20);
+    assert.deepEqual(catalog.category_labels, englishCategories);
+    for (const category of ['phone', 'tablet', 'laptop', 'accessory']) assert.equal(catalog.products.filter(p => p.category === category).length, 5);
+  });
+  for (const item of catalog.products) {
+    const response = await fetch(base + item.image_url);
+    check(`Real product image is available: ${item.name}`, () => {
+      assert.equal(response.status, 200);
+      assert.match(response.headers.get('content-type'), /^image\/(jpeg|png|webp)/);
+      assert.equal(item.image_is_illustration, false);
+    });
+  }
   await testText(); await testVoice(); await testImage(); await testOrders();
   console.log(`\n${checks} DOM/API interaction checks passed. Browser layout is not evaluated.`);
 })().catch(error => { console.error(error); process.exitCode = 1; });

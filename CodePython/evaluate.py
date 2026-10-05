@@ -8,19 +8,22 @@ else:
 
 def main():
     ui = build_ui()
+    products = ui.search_service.repository.all_products()
+    by_id = {product['id']: product for product in products}
+    cheapest_phone = min((p for p in products if p['category'] == 'phone'), key=lambda p: p['price'])
     cases = [
-        ('text', 'black shoes', 1),
-        ('text', 'red t-shirt', 6),
-        ('text', 'brown backpack', 8),
-        ('text', 'white sneakers', 9),
-        ('voice', 'find running shoes', 1),
-        ('voice', 'find black leather bag', 3),
-        ('image', [0.90, 0.10, 0.20], 1),
-        ('image', [0.12, 0.20, 0.93], 3),
-        ('image', [0.20, 0.90, 0.15], 6),
+        ('text', by_id[1]['name'], 1),
+        ('text', by_id[6]['name'], 6),
+        ('text', by_id[11]['name'], 11),
+        ('text', by_id[16]['name'], 16),
+        ('voice', 'find laptop', 11),
+        ('voice', 'find mouse', 16),
+        ('image', by_id[1]['embedding'], 1),
+        ('image', by_id[6]['embedding'], 6),
+        ('image', by_id[11]['embedding'], 11),
         ('text', 'zzznomatchingproductzzz', None),
         # An intentional failure: the keyword baseline does not parse price limits.
-        ('text', 'Nike shoes under 100 dollars', 5),
+        ('text', f"phone under {cheapest_phone['price'] + 1} dollars", cheapest_phone['id']),
     ]
     passed = 0
     print('| Mode | Input | Expected top ID | Actual top ID | Score | Success |')

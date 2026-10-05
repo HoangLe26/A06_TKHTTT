@@ -30,15 +30,15 @@ Môi trường `.venv` ở thư mục cha đã có NumPy. Từ thư mục cha hi
 ```powershell
 python main.py
 python main.py --mode demo --top-k 3
-python main.py --mode text --query "black shoes"
-python main.py --mode voice --query "find running shoes" --top-k 3
-python main.py --mode image --embedding 0.90 0.10 0.20 --top-k 5
+python main.py --mode text --query "phone"
+python main.py --mode voice --query "find laptop" --top-k 3
+python main.py --mode image --embedding 0.95 0.10 0.05 --top-k 5
 python main.py --mode interactive
 ```
 
-Chế độ tương tác nhận `text`, `voice`, `image`, `exit` (hoặc `1`, `2`, `3`, `0`). Vector có thể nhập `0.90 0.10 0.20` hoặc `0.90, 0.10, 0.20`. EOF hoặc Ctrl+C thoát gọn. `--top-k` phải là số nguyên dương; bỏ tùy chọn này để nhận toàn bộ kết quả.
+Chế độ tương tác nhận `text`, `voice`, `image`, `exit` (hoặc `1`, `2`, `3`, `0`). Vector có thể nhập `0.95 0.10 0.05` hoặc `0.95, 0.10, 0.05`. EOF hoặc Ctrl+C thoát gọn. `--top-k` phải là số nguyên dương; bỏ tùy chọn này để nhận toàn bộ kết quả.
 
-Mỗi kết quả hiển thị tên, category, color, price, stock và điểm. Các mức giá trong dữ liệu là số minh họa; chưa gắn đơn vị tiền tệ. Tìm kiếm ảnh hiển thị nhãn `similarity`. Không có kết quả sẽ hiện `No products found.`; đầu vào không hợp lệ được báo lỗi kiểm tra dữ liệu, không in traceback trong UI.
+Mỗi kết quả hiển thị tên, category, color, price, stock và điểm. Các mức giá trong dữ liệu là số minh họa; dùng đơn vị USD để demo, không phải giá bán hiện hành. Tìm kiếm ảnh hiển thị nhãn `similarity`. Không có kết quả sẽ hiện `No products found.`; đầu vào không hợp lệ được báo lỗi kiểm tra dữ liệu, không in traceback trong UI.
 
 ## Kiến trúc ba lớp
 
@@ -65,10 +65,10 @@ CodePython/
 │   ├── order_repository.py          # Kho đơn hàng nhỏ để mở rộng sau này
 │   ├── vector_index.py              # Vector ảnh theo ID sản phẩm
 │   ├── vector_validation.py         # Kiểm tra vector dùng chung
-│   ├── products.json                # Ít nhất 10 sản phẩm và embeddings
+│   ├── products.json                # 20 sản phẩm thật và embeddings nhân tạo
 │   ├── orders.json                  # Ba đơn mẫu cho giao diện Order Search
-│   └── images/                      # SVG minh họa giày, áo, túi; không mã hóa ảnh
-├── tests/                          # 15 kiểm thử API/pipeline bằng unittest
+│   └── images/                      # Ảnh chính hãng trong catalog/; không mã hóa ảnh
+├── tests/                          # 19 kiểm thử API/pipeline bằng unittest
 ├── requirements.txt
 └── README.md
 ```
@@ -77,12 +77,12 @@ Luồng xử lý: `SearchUI → QueryService → SearchService → RankingServic
 
 ## Cách tìm kiếm và xếp hạng
 
-- **Văn bản:** chuyển query và chuỗi `name + category + color` thành chữ thường, tách query theo khoảng trắng. Mỗi từ xuất hiện trong chuỗi sản phẩm đóng góp 1 điểm. Đây là đối chiếu chuỗi con theo từ khóa, nên có thể trả về sản phẩm chỉ khớp một phần truy vấn. Ví dụ `black shoes`: giày đen thường nhận 2 điểm; giày màu khác hoặc sản phẩm đen khác nhận 1 điểm.
-- **Giọng nói mô phỏng:** đầu vào là văn bản đã phiên âm, ví dụ `find running shoes`. `transcribe()` trả lại văn bản này rồi dùng cùng cơ chế truy xuất văn bản. Prototype không ghi âm microphone và không gọi API nhận dạng giọng nói.
-- **Ảnh:** đầu vào là vector số nhân tạo ba chiều, ví dụ `[0.90, 0.10, 0.20]`; không phải đường dẫn file ảnh. Điểm là `dot(a,b) / (norm(a) * norm(b))`. Vector không có độ lớn trả điểm 0; vector sai chiều, rỗng hoặc không phải số được kiểm tra và báo lỗi.
+- **Văn bản:** chuyển query và chuỗi `name + category + color + search_terms` thành chữ thường, tách query theo khoảng trắng. Mỗi từ xuất hiện trong chuỗi sản phẩm đóng góp 1 điểm. Đây là đối chiếu chuỗi con theo từ khóa, nên có thể trả về sản phẩm chỉ khớp một phần truy vấn. Ví dụ `phone` trả 5 điện thoại. Có thêm từ khóa danh mục tiếng Việt có dấu/không dấu và từ khóa `chuột`, `bàn phím`.
+- **Giọng nói mô phỏng:** đầu vào là văn bản đã phiên âm, ví dụ `find laptop`. `transcribe()` trả lại văn bản này rồi dùng cùng cơ chế truy xuất văn bản. Prototype không ghi âm microphone và không gọi API nhận dạng giọng nói.
+- **Ảnh:** đầu vào là vector số nhân tạo ba chiều, ví dụ `[0.95, 0.10, 0.05]`; không phải đường dẫn file ảnh. Điểm là `dot(a,b) / (norm(a) * norm(b))`. Vector không có độ lớn trả điểm 0; vector sai chiều, rỗng hoặc không phải số được kiểm tra và báo lỗi.
 - **Xếp hạng:** sắp xếp ứng viên theo điểm từ cao xuống thấp. Điểm bằng nhau giữ nguyên thứ tự ứng viên để kết quả ổn định. Giới hạn `top_k` áp dụng sau khi xếp hạng. Điểm keyword và cosine thuộc hai thang đo khác nhau, không dùng để so sánh chéo các chế độ.
 
-Thư mục `data/images/` có ba ảnh SVG minh họa giày, áo và túi, cùng `README.md` ánh xạ ví dụ sang vector nhân tạo. Các ảnh giúp trình bày demo; chương trình nhận vector nhập thủ công và **không đọc pixel hay tự mã hóa file ảnh**. Vector chỉ dùng để minh họa phép tính cosine, không phản ánh đặc trưng ảnh thật.
+Thư mục `data/images/catalog/` lưu 20 ảnh sản phẩm từ Apple, ASUS và Logitech; không dùng ảnh sinh bởi AI. Xem [PRODUCT_SOURCES.md](data/PRODUCT_SOURCES.md) để biết từng tên, model, ảnh và nguồn chính hãng. Giá/tồn kho là dữ liệu demo. Ảnh là thật nhưng vector vẫn được gán thủ công: chương trình **không đọc pixel hay tự mã hóa file ảnh**. Các SVG cũ chỉ được giữ lại, không dùng cho sản phẩm hiện tại.
 
 ## Kiểm thử
 
@@ -99,12 +99,14 @@ python main.py --mode image --embedding invalid 0.10 0.20
 
 Query rỗng được xử lý có kiểm soát; query không khớp trả danh sách rỗng. Vector không không gây chia cho 0. Hai lệnh cuối minh họa lỗi kích thước và lỗi thành phần không phải số.
 
-Báo cáo tích hợp và kiểm thử web ở `../FrontEnd/INTEGRATION_NOTES.md`: 15 test backend và 33 kiểm tra DOM đạt. Dùng `main.py` và `evaluate.py` để chạy demo và đánh giá console.
+Báo cáo tích hợp và kiểm thử web ở `../FrontEnd/INTEGRATION_NOTES.md`. Dùng `main.py` và `evaluate.py` để chạy demo và đánh giá console.
 
 Chạy `python evaluate.py` để in bảng đánh giá 11 truy vấn. Dữ liệu hiện tại đạt 10/11 (90,91%): 10 tình huống trong khả năng prototype và 1 tình huống có yêu cầu lọc giá mà thuật toán từ khóa chưa hỗ trợ. Đây là tập ví dụ nhỏ được chọn thủ công, không phải độ chính xác trên dữ liệu thực tế. API web có filter `max_price` rõ ràng; chưa phân tích điều kiện giá trong câu tìm kiếm tự nhiên.
 
 ## Thay đổi dữ liệu và giới hạn
 
-Chỉnh `data/products.json` để thêm hoặc sửa sản phẩm; mỗi bản ghi gồm `id`, `name`, `category`, `color`, `price`, `stock`, `embedding`. Giữ `id` duy nhất, chuỗi mô tả không rỗng, giá/tồn kho hợp lệ và tất cả embeddings có cùng số chiều (mặc định 3). Nếu đổi số chiều, đổi vector của mọi sản phẩm và vector truy vấn tương ứng. Repository và index kiểm tra dữ liệu khi khởi tạo.
+Chỉnh `data/products.json` để thêm hoặc sửa sản phẩm; mỗi bản ghi gồm `id`, `name`, `category`, `color`, `price`, `stock`, `embedding`, `image`, `source_url`, `image_source_url`, `price_is_demo` và `search_terms`. `image` là đường dẫn tương đối dưới `data/images/`. Giữ `id` duy nhất, chuỗi mô tả không rỗng, giá/tồn kho hợp lệ và tất cả embeddings có cùng số chiều (mặc định 3). Nếu đổi số chiều, đổi vector của mọi sản phẩm và vector truy vấn tương ứng. Repository và index kiểm tra dữ liệu khi khởi tạo.
 
-Dữ liệu nhỏ và lưu cục bộ. Tìm kiếm văn bản không hiểu ngữ nghĩa, từ đồng nghĩa, tiếng Việt hoặc lỗi chính tả; dữ liệu mẫu và query demo dùng tiếng Anh. Embedding ảnh là số minh họa, chưa trích xuất đặc trưng từ ảnh thật. Giọng nói là mô phỏng. Xếp hạng chỉ dựa vào điểm phù hợp; API web có bộ lọc danh mục, tồn kho, giá và similarity, còn console giữ cách tìm kiếm cơ bản. Đã có giao diện web local và tra đơn mẫu; chưa có database, đăng nhập, giỏ hàng, đặt hàng, thanh toán hay tracking thực tế.
+Dữ liệu nhỏ và lưu cục bộ. Tìm kiếm văn bản không hiểu ngữ nghĩa hay lỗi chính tả; tiếng Việt chỉ được hỗ trợ bằng các từ khóa bổ sung đã khai báo. Embedding ảnh là số minh họa, chưa trích xuất đặc trưng từ ảnh thật. Giọng nói là mô phỏng. Xếp hạng chỉ dựa vào điểm phù hợp; API web có bộ lọc danh mục, tồn kho, giá và similarity, còn console giữ cách tìm kiếm cơ bản. Đã có giao diện web local và tra đơn mẫu; chưa có database, đăng nhập, giỏ hàng, đặt hàng, thanh toán hay tracking thực tế.
+
+Sau khi sửa JSON, dừng server bằng Ctrl+C rồi chạy lại để nạp dữ liệu mới. Catalog hiện gồm 5 điện thoại, 5 máy tính bảng, 5 laptop và 5 phụ kiện (3 chuột, 2 bàn phím).

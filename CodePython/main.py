@@ -93,9 +93,9 @@ def main(argv=None):
 
     if args.mode == "demo":
         print("=== E-Commerce Search Demo ===")
-        ui.search_text("black shoes", top_k=args.top_k)
-        ui.search_voice("find running shoes", top_k=args.top_k)
-        ui.search_image([0.90, 0.10, 0.20], top_k=args.top_k)
+        ui.search_text("phone", top_k=args.top_k)
+        ui.search_voice("find laptop", top_k=args.top_k)
+        ui.search_image(ui.search_service.repository.find_by_id(1)['embedding'], top_k=args.top_k)
     elif args.mode == "text":
         ui.search_text(args.query, top_k=args.top_k)
     elif args.mode == "voice":

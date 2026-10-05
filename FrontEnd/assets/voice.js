@@ -61,7 +61,7 @@
   }
 
   function preset() {
-    input.value = 'find running shoes';
+    input.value = 'find laptop';
     category.value = '';
     inStock.checked = false;
     limit.value = '';

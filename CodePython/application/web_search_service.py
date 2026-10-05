@@ -6,11 +6,10 @@ from time import perf_counter
 
 
 def product_for_web(product):
-    """Attach a local illustration without changing the stored catalogue."""
+    """Attach the locally stored manufacturer's product image."""
     result = dict(product)
-    image = {'shoes': 'shoe.svg', 'bag': 'bag.svg', 'clothing': 'shirt.svg'}
-    result['image_url'] = '/product-images/' + image.get(product['category'], 'accessory.svg')
-    result['image_is_illustration'] = True
+    result['image_url'] = '/product-images/' + product['image'] if product.get('image') else None
+    result['image_is_illustration'] = False
     return result
 
 
@@ -43,6 +42,8 @@ class WebSearchService:
         return {
             'products': [product_for_web(product) for product in products],
             'categories': sorted({product['category'] for product in products}),
+            'category_labels': {'phone': 'Phones', 'tablet': 'Tablets',
+                                'laptop': 'Laptops', 'accessory': 'Accessories'},
             'vector_dimension': self.search_service.vector_index.dimension,
         }
 
@@ -65,6 +66,11 @@ class WebSearchService:
             query = self.query_service.image_query(payload.get('embedding'))
         else:
             raise ValueError('Search type must be text, voice, or image.')
+        browse_catalog = payload.get('browse_catalog', False)
+        if not isinstance(browse_catalog, bool):
+            raise ValueError('browse_catalog must be true or false.')
+        if browse_catalog and (mode != 'text' or query['query'].strip()):
+            raise ValueError('Catalog browsing requires text mode with an empty query.')
         top_k = payload.get('top_k')
         if top_k is not None and (
             not isinstance(top_k, int) or isinstance(top_k, bool) or not 0 <= top_k <= 100
@@ -87,7 +93,10 @@ class WebSearchService:
         threshold = optional_number(payload.get('min_similarity'), 'min_similarity', -1, 1)
         if threshold is not None and mode != 'image':
             raise ValueError('min_similarity is only supported for image search.')
-        candidates = self.search_service.search(query)
+        candidates = (
+            [(product, 0.0) for product in self.search_service.repository.all_products()]
+            if browse_catalog else self.search_service.search(query)
+        )
         filtered = [
             (product, score) for product, score in candidates
             if (category is None or product['category'].lower() == category)
@@ -107,7 +116,9 @@ class WebSearchService:
             'filtered_count': len(filtered),
             'returned_count': len(ranked),
             'duration_ms': round((perf_counter() - started) * 1000, 3),
-            'method': 'Cosine similarity (artificial vectors)' if mode == 'image' else 'Keyword matching',
+            'method': ('Catalog browsing' if browse_catalog else
+                       'Cosine similarity (artificial vectors)' if mode == 'image' else 'Keyword matching'),
+            'browse_catalog': browse_catalog,
             'vector_dimension': self.search_service.vector_index.dimension,
             'filters': {'category': category, 'in_stock': in_stock, 'max_price': max_price},
             'min_similarity': threshold,
