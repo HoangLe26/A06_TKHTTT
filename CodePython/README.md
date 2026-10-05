@@ -2,6 +2,8 @@
 
 Prototype Python cho Assignment 06, Task 5: kho sản phẩm, tìm kiếm văn bản, giọng nói mô phỏng, tìm kiếm bằng vector ảnh và xếp hạng kết quả. Chạy mặc định sẽ trình diễn cả ba cách tìm kiếm, phù hợp để demo Task 6.
 
+Đã tích hợp thêm giao diện HTML trong `../FrontEnd`. Từ folder gốc chạy `.\.venv\Scripts\python.exe CodePython/web_server.py`, rồi mở `http://127.0.0.1:8000/`. Khi đang ở `CodePython`, chạy `python web_server.py`. Xem `../FrontEnd/README.md` để biết cách sử dụng và giới hạn tương thích.
+
 ## Cài đặt và chạy
 
 Cần Python **3.10 trở lên**, pip và NumPy. Trong terminal tại thư mục `CodePython`:
@@ -44,12 +46,15 @@ Mỗi kết quả hiển thị tên, category, color, price, stock và điểm. 
 CodePython/
 ├── main.py                         # Composition root, CLI và demo
 ├── evaluate.py                     # Đánh giá truy vấn và ví dụ giới hạn
+├── web_server.py                   # Server local phục vụ frontend và API JSON
 ├── presentation/
 │   ├── __init__.py
 │   └── search_ui.py                 # Nhận đầu vào, gọi service, hiển thị
 ├── application/
 │   ├── __init__.py
 │   ├── query_service.py             # Biểu diễn truy vấn chung
+│   ├── web_search_service.py        # Chuyển request web sang pipeline + bộ lọc
+│   ├── order_service.py             # Lắp dữ liệu chi tiết/tổng tiền đơn mẫu
 │   ├── speech_service.py            # Speech-to-text mô phỏng
 │   ├── image_service.py             # Cosine similarity
 │   ├── search_service.py            # Truy xuất ứng viên
@@ -61,9 +66,9 @@ CodePython/
 │   ├── vector_index.py              # Vector ảnh theo ID sản phẩm
 │   ├── vector_validation.py         # Kiểm tra vector dùng chung
 │   ├── products.json                # Ít nhất 10 sản phẩm và embeddings
+│   ├── orders.json                  # Ba đơn mẫu cho giao diện Order Search
 │   └── images/                      # SVG minh họa giày, áo, túi; không mã hóa ảnh
-├── tests/                          # Kiểm thử tự động bằng unittest
-├── demo_results/                   # Đầu ra demo và kết quả kiểm thử đã ghi lại
+├── tests/                          # 15 kiểm thử API/pipeline bằng unittest
 ├── requirements.txt
 └── README.md
 ```
@@ -94,12 +99,12 @@ python main.py --mode image --embedding invalid 0.10 0.20
 
 Query rỗng được xử lý có kiểm soát; query không khớp trả danh sách rỗng. Vector không không gây chia cho 0. Hai lệnh cuối minh họa lỗi kích thước và lỗi thành phần không phải số.
 
-Đầu ra demo và báo cáo kiểm thử thực tế được lưu trong `demo_results/` để đối chiếu khi thuyết trình. Có thể chạy lại các lệnh trên để kiểm tra phiên bản dữ liệu hiện tại.
+Báo cáo tích hợp và kiểm thử web ở `../FrontEnd/INTEGRATION_NOTES.md`: 15 test backend và 33 kiểm tra DOM đạt. Dùng `main.py` và `evaluate.py` để chạy demo và đánh giá console.
 
-Chạy `python evaluate.py` để in bảng đánh giá 11 truy vấn. Dữ liệu hiện tại đạt 10/11 (90,91%): 10 tình huống trong khả năng prototype và 1 tình huống có yêu cầu lọc giá mà thuật toán từ khóa chưa hỗ trợ. Đây là tập ví dụ nhỏ được chọn thủ công, không phải độ chính xác trên dữ liệu thực tế. Xem `demo_results/EVALUATION.md` để biết tiêu chí và kết quả cụ thể.
+Chạy `python evaluate.py` để in bảng đánh giá 11 truy vấn. Dữ liệu hiện tại đạt 10/11 (90,91%): 10 tình huống trong khả năng prototype và 1 tình huống có yêu cầu lọc giá mà thuật toán từ khóa chưa hỗ trợ. Đây là tập ví dụ nhỏ được chọn thủ công, không phải độ chính xác trên dữ liệu thực tế. API web có filter `max_price` rõ ràng; chưa phân tích điều kiện giá trong câu tìm kiếm tự nhiên.
 
 ## Thay đổi dữ liệu và giới hạn
 
 Chỉnh `data/products.json` để thêm hoặc sửa sản phẩm; mỗi bản ghi gồm `id`, `name`, `category`, `color`, `price`, `stock`, `embedding`. Giữ `id` duy nhất, chuỗi mô tả không rỗng, giá/tồn kho hợp lệ và tất cả embeddings có cùng số chiều (mặc định 3). Nếu đổi số chiều, đổi vector của mọi sản phẩm và vector truy vấn tương ứng. Repository và index kiểm tra dữ liệu khi khởi tạo.
 
-Dữ liệu nhỏ và lưu cục bộ. Tìm kiếm văn bản không hiểu ngữ nghĩa, từ đồng nghĩa, tiếng Việt hoặc lỗi chính tả; dữ liệu mẫu và query demo dùng tiếng Anh. Embedding ảnh là số minh họa, chưa trích xuất đặc trưng từ ảnh thật. Giọng nói là mô phỏng. Xếp hạng chỉ dựa vào điểm phù hợp, không lọc sản phẩm theo tồn kho. Chưa có database, đăng nhập, đặt hàng, giao diện web hay backend thương mại điện tử; các tính năng này không thuộc năm yêu cầu Task 5.
+Dữ liệu nhỏ và lưu cục bộ. Tìm kiếm văn bản không hiểu ngữ nghĩa, từ đồng nghĩa, tiếng Việt hoặc lỗi chính tả; dữ liệu mẫu và query demo dùng tiếng Anh. Embedding ảnh là số minh họa, chưa trích xuất đặc trưng từ ảnh thật. Giọng nói là mô phỏng. Xếp hạng chỉ dựa vào điểm phù hợp; API web có bộ lọc danh mục, tồn kho, giá và similarity, còn console giữ cách tìm kiếm cơ bản. Đã có giao diện web local và tra đơn mẫu; chưa có database, đăng nhập, giỏ hàng, đặt hàng, thanh toán hay tracking thực tế.

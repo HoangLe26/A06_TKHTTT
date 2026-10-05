@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320">
+  <title>Illustrative sports cap</title>
+  <rect width="480" height="320" rx="24" fill="#eef2f6"/>
+  <path d="M132 196 Q129 87 237 84 Q331 85 334 196Z" fill="#252a34"/>
+  <path d="M124 195 H334 Q385 197 398 232 Q300 254 127 228Z" fill="#596274"/>
+  <path d="M237 87 V194" fill="none" stroke="#7b8a9f" stroke-width="4"/>
+  <text x="240" y="287" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#344054">Sample illustration</text>
+</svg>

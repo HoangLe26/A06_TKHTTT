@@ -1,0 +1,8 @@
+{
+  "name": "assignment06-frontend-checks",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Optional DOM integration checks; the application itself runs with Python only.",
+  "scripts": {"test": "node tests/integration.cjs"},
+  "devDependencies": {"jsdom": "^26.1.0"}
+}
