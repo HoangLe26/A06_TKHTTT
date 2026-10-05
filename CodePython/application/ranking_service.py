@@ -1,11 +1,14 @@
-"""Stable descending score ordering, optionally limited to the best matches."""
+"""Xếp hạng theo điểm giảm dần, giữ thứ tự khi đồng điểm và hỗ trợ giới hạn top-k."""
 
 import math
 from numbers import Real
 
 
 class RankingService:
+    """Chỉ sắp xếp kết quả đã tìm được; không đọc dữ liệu hoặc tính điểm tìm kiếm."""
+
     def rank(self, candidates, top_k=None):
+        """Kiểm tra các cặp (sản phẩm, điểm) rồi lấy tối đa top_k kết quả tốt nhất."""
         if top_k is not None and (
             not isinstance(top_k, int) or isinstance(top_k, bool) or top_k < 0
         ):
@@ -14,6 +17,7 @@ class RankingService:
             entries = list(candidates)
         except TypeError as exc:
             raise ValueError("Candidates must be an iterable of (product, score) pairs.") from exc
+        # Không cho phép điểm NaN/vô cực hoặc dữ liệu sai cấu trúc tham gia xếp hạng.
         for candidate in entries:
             if not isinstance(candidate, (tuple, list)) or len(candidate) != 2:
                 raise ValueError("Every candidate must be a (product, score) pair.")
@@ -27,5 +31,6 @@ class RankingService:
                 valid_score = False
             if not valid_score:
                 raise ValueError("Candidate scores must be finite numbers.")
+        # sorted giữ thứ tự ban đầu của các phần tử đồng điểm (sắp xếp ổn định).
         ranked = sorted(entries, key=lambda candidate: candidate[1], reverse=True)
         return ranked if top_k is None else ranked[:top_k]

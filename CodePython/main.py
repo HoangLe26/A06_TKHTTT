@@ -1,7 +1,8 @@
-"""Composition root and console entry point for the three-layer prototype."""
+"""Khởi tạo các thành phần ba lớp và cung cấp điểm chạy chương trình console."""
 
 import argparse
 
+# Hỗ trợ cả `python -m CodePython.main` và `python CodePython/main.py`.
 if __package__:
     from .application.image_service import ImageService
     from .application.query_service import QueryService
@@ -23,9 +24,10 @@ else:
 
 
 def build_ui():
-    """Create storage and services, then inject them into the presentation layer."""
+    """Tạo kho dữ liệu và các service, sau đó truyền chúng vào SearchUI."""
     repository = ProductRepository()
     vector_index = VectorIndex(repository.all_products())
+    # Console và web dùng chung các thành phần này để thống nhất cách tìm kiếm.
     return SearchUI(
         QueryService(),
         SpeechService(),
@@ -35,7 +37,7 @@ def build_ui():
 
 
 def positive_integer(value):
-    """Argparse validator for an optional result limit."""
+    """Kiểm tra tham số top-k của console phải là số nguyên lớn hơn 0."""
     try:
         number = int(value)
     except (ValueError, TypeError) as exc:
@@ -46,7 +48,7 @@ def positive_integer(value):
 
 
 def run_interactive(ui, top_k=None):
-    """Accept repeated console searches without requiring a real image or mic."""
+    """Cho phép tìm nhiều lần trong terminal, không cần microphone hay ảnh thật."""
     print("\nInteractive search: text / voice / image / exit")
     try:
         while True:
@@ -59,6 +61,7 @@ def run_interactive(ui, top_k=None):
             elif mode in {"voice", "2"}:
                 ui.search_voice(input("Simulated voice text: "), top_k=top_k)
             elif mode in {"image", "3"}:
+                # Chấp nhận cả dấu phẩy lẫn khoảng trắng ngăn cách các số vector.
                 raw_embedding = input("Image vector (e.g. 0.90 0.10 0.20): ")
                 ui.search_image(raw_embedding.replace(",", " ").split(), top_k=top_k)
             else:
@@ -68,6 +71,7 @@ def run_interactive(ui, top_k=None):
 
 
 def main(argv=None):
+    """Đọc tham số dòng lệnh, khởi tạo hệ thống và chạy chế độ được chọn."""
     parser = argparse.ArgumentParser(
         description="Multimodal product search: keywords, simulated voice, artificial vectors."
     )
@@ -79,6 +83,7 @@ def main(argv=None):
         "--embedding", nargs="+", help="Numeric image-vector components, e.g. 0.90 0.10 0.20"
     )
     parser.add_argument("--top-k", type=positive_integer, help="Maximum number of results")
+    # Kiểm tra tham số bắt buộc theo chế độ trước khi nạp dữ liệu sản phẩm.
     args = parser.parse_args(argv)
     if args.mode in {"text", "voice"} and args.query is None:
         parser.error("--query is required for text and voice modes")
@@ -91,6 +96,7 @@ def main(argv=None):
         print(f"Unable to initialize search: {exc}")
         return 1
 
+    # Chế độ mặc định minh họa đủ text, voice mô phỏng và vector ảnh nhân tạo.
     if args.mode == "demo":
         print("=== E-Commerce Search Demo ===")
         ui.search_text("phone", top_k=args.top_k)
@@ -107,5 +113,6 @@ def main(argv=None):
     return 0
 
 
+# Chỉ tự chạy khi mở file trực tiếp; import build_ui không kích hoạt chương trình.
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -14,7 +14,7 @@ import sys
 from tempfile import TemporaryDirectory
 from urllib.parse import urlsplit
 
-DATA_ROOT = Path(__file__).resolve().parent
+DATA_ROOT = Path(__file__).resolve().parents[3] / 'CodePython' / 'data'
 IMAGE_ROOT = DATA_ROOT / 'images'
 ALLOWED_HOSTS = {'store.storeimages.cdn-apple.com', 'www.apple.com',
                  'support.apple.com', 'cdsassets.apple.com', 'help.apple.com',

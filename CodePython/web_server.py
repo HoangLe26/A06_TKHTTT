@@ -1,4 +1,4 @@
-"""Serve the existing frontend and a small local JSON API using Python only."""
+"""Chạy web local, phục vụ giao diện HTML và API JSON bằng thư viện chuẩn Python."""
 
 import argparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -9,6 +9,7 @@ from pathlib import Path
 import socket
 from urllib.parse import unquote, urlsplit
 
+# Chọn kiểu import phù hợp khi chạy dạng package hoặc mở file trực tiếp.
 if __package__:
     from .application.order_service import OrderService
     from .application.web_search_service import WebSearchService
@@ -20,39 +21,47 @@ else:
     from data.order_repository import OrderRepository
     from main import build_ui
 
+# Xác định tài nguyên theo vị trí code, không phụ thuộc folder của terminal.
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FRONTEND_ROOT = PROJECT_ROOT / 'FrontEnd'
 IMAGE_ROOT = Path(__file__).resolve().parent / 'data' / 'images'
+# Chỉ bốn trang đã khai báo được phục vụ, không công khai toàn bộ folder dự án.
 PAGES = {
     '/text-search': 'text_search_vintage_editorial/code.html',
     '/voice-search': 'voice_search_vintage_editorial/code.html',
     '/image-search': 'image_search_vintage_editorial/code.html',
     '/order-search': 'order_search_details_vintage_editorial/code.html',
 }
+# Giới hạn phần thân yêu cầu JSON ở 64 KiB để tránh đọc dữ liệu quá lớn.
 MAX_BODY = 65536
 
 
 def build_services():
+    """Dùng lại bộ tìm kiếm console và bổ sung dịch vụ tra đơn cho web."""
     ui = build_ui()
     search = WebSearchService(ui.query_service, ui.speech_service, ui.search_service, ui.ranking_service)
     orders = OrderService(OrderRepository.from_json(), ui.search_service.repository)
-    # Fail at startup with a useful diagnostic if demo data is inconsistent.
+    # Kiểm tra đơn mẫu ngay lúc khởi động để báo sớm nếu dữ liệu bị sai.
     orders.all_orders()
     return search, orders
 
 
 class SearchHTTPServer(ThreadingHTTPServer):
+    """HTTP server xử lý nhiều yêu cầu bằng luồng riêng và giữ các service dùng chung."""
+
     daemon_threads = True
     allow_reuse_address = os.name != 'nt'
 
     def server_bind(self):
-        # On Windows SO_REUSEADDR can let two live servers share a port,
-        # causing requests to reach an older application instance.
+        """Gắn server vào địa chỉ/cổng, không cho chia sẻ cổng đang chạy trên Windows."""
+        # SO_REUSEADDR trên Windows có thể cho hai server dùng chung cổng,
+        # khiến request đi nhầm tới phiên bản ứng dụng cũ.
         if os.name == 'nt':
             self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
         super().server_bind()
 
     def __init__(self, address, search_service, order_service, frontend_root=FRONTEND_ROOT):
+        """Lưu dịch vụ và folder giao diện trước khi khởi tạo bộ xử lý HTTP."""
         self.search_service = search_service
         self.order_service = order_service
         self.frontend_root = Path(frontend_root)
@@ -60,14 +69,18 @@ class SearchHTTPServer(ThreadingHTTPServer):
 
 
 class SearchRequestHandler(BaseHTTPRequestHandler):
+    """Phân tuyến HTTP, kiểm tra yêu cầu và trả file tĩnh hoặc dữ liệu JSON."""
+
     server_version = 'MultimodalSearch/1.0'
 
     def _send(self, status, content, content_type='application/json; charset=utf-8', head=False):
+        """Gửi mã trạng thái, header và nội dung; HEAD chỉ gửi header."""
         if not isinstance(content, bytes):
             content = json.dumps(content, ensure_ascii=False, allow_nan=False).encode('utf-8')
         self.send_response(status)
         self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(content)))
+        # Yêu cầu browser dùng đúng kiểu nội dung và không lưu phản hồi cũ vào cache.
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Cache-Control', 'no-store')
         self.end_headers()
@@ -75,6 +88,7 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(content)
 
     def _file(self, path, head=False):
+        """Đọc file tồn tại và xác định Content-Type theo phần mở rộng."""
         if not path.is_file():
             return self._send(404, {'error': 'File not found.'}, head=head)
         content_type = mimetypes.guess_type(path.name)[0] or 'application/octet-stream'
@@ -83,16 +97,21 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
         return self._send(200, path.read_bytes(), content_type, head=head)
 
     def _static(self, root, relative_path, extensions, head=False):
+        """Chỉ cho đọc file trong folder cho phép và có phần mở rộng hợp lệ."""
         path = (root / relative_path).resolve()
+        # resolve và kiểm tra phạm vi chặn đường dẫn ../ truy cập ra ngoài folder.
         if not path.is_relative_to(root.resolve()) or path.suffix.lower() not in extensions:
             return self._send(404, {'error': 'File not found.'}, head=head)
         return self._file(path, head=head)
 
     def do_HEAD(self):
+        """Dùng lại tuyến GET nhưng không gửi phần thân phản hồi."""
         self.do_GET(head=True)
 
     def do_GET(self, head=False):
+        """Phục vụ trang giao diện, tài nguyên, catalog, sản phẩm và đơn hàng."""
         path = unquote(urlsplit(self.path).path)
+        # Trang gốc chuyển người dùng đến màn hình Text Search.
         if path == '/':
             self.send_response(302)
             self.send_header('Location', '/text-search')
@@ -101,19 +120,22 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
         try:
             if path in PAGES:
                 return self._file(self.server.frontend_root / PAGES[path], head=head)
-            # Support users who already bookmarked the original HTML paths.
+            # Giữ tương thích với bookmark trỏ vào đường dẫn HTML ban đầu.
             if path.lstrip('/') in PAGES.values():
                 return self._file(self.server.frontend_root / path.lstrip('/'), head=head)
+            # Tài nguyên giao diện và ảnh có folder gốc/phần mở rộng riêng được phép.
             if path.startswith('/assets/'):
                 return self._static(self.server.frontend_root / 'assets', path[8:], {'.js', '.css', '.svg'}, head)
             if path.startswith('/product-images/'):
                 return self._static(IMAGE_ROOT, path[16:], {'.svg', '.png', '.jpg', '.jpeg', '.webp'}, head)
+            # API kiểm tra trạng thái trả số sản phẩm/đơn và chế độ mô phỏng.
             if path == '/api/health':
                 catalog = self.server.search_service.catalog()
                 return self._send(200, {'status': 'ok', 'product_count': len(catalog['products']),
                     'order_count': len(self.server.order_service.all_orders()),
                     'vector_dimension': catalog['vector_dimension'],
                     'voice_mode': 'simulated', 'image_mode': 'artificial vectors'}, head=head)
+            # Các tuyến dữ liệu chỉ đọc: catalog, danh sách/chi tiết đơn và sản phẩm.
             if path == '/api/catalog':
                 return self._send(200, self.server.search_service.catalog(), head=head)
             if path == '/api/orders':
@@ -128,6 +150,7 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
                     raise ValueError('Product ID must be an integer.') from None
                 result = self.server.search_service.product(product_id)
                 return self._send(200, {'product': result}, head=head) if result else self._send(404, {'error': 'Product not found.'}, head=head)
+            # Tìm kiếm cần nhận JSON đầu vào nên không hỗ trợ GET.
             if path == '/api/search':
                 return self._send(405, {'error': 'Use POST for search.'}, head=head)
             return self._send(404, {'error': 'Page or endpoint not found.'}, head=head)
@@ -137,14 +160,17 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
             return self._send(500, {'error': 'Unable to read application files.'}, head=head)
 
     def do_POST(self):
+        """Nhận JSON tìm kiếm, kiểm tra kích thước/định dạng rồi gọi service."""
         if urlsplit(self.path).path != '/api/search':
             return self._send(404, {'error': 'Endpoint not found.'})
+        # Không nhận form hoặc dữ liệu ảnh; endpoint này chỉ nhận application/json.
         if self.headers.get_content_type() != 'application/json':
             return self._send(415, {'error': 'Content-Type must be application/json.'})
         try:
             length = int(self.headers.get('Content-Length', '0'))
         except ValueError:
             return self._send(400, {'error': 'Invalid Content-Length.'})
+        # Kiểm tra độ dài trước khi đọc request để tránh nạp quá nhiều dữ liệu.
         if not 0 < length <= MAX_BODY:
             return self._send(413 if length > MAX_BODY else 400, {'error': 'JSON request must be between 1 byte and 64 KiB.'})
         try:
@@ -152,6 +178,7 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
             payload = json.loads(raw.decode('utf-8'))
         except (UnicodeDecodeError, json.JSONDecodeError):
             return self._send(400, {'error': 'Invalid JSON request.'})
+        # Lỗi kiểm tra đầu vào trả HTTP 400 dưới dạng JSON cho giao diện hiển thị.
         try:
             return self._send(200, self.server.search_service.search(payload))
         except (ValueError, TypeError) as exc:
@@ -159,7 +186,9 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
 
 
 def main(argv=None):
+    """Đọc host/port, khởi động server local và đóng socket khi dừng."""
     parser = argparse.ArgumentParser(description='Serve FrontEnd with the Python search API locally.')
+    # Chỉ cho phép lắng nghe trên máy local, không mở server cho mạng bên ngoài.
     parser.add_argument('--host', choices=['127.0.0.1', 'localhost'], default='127.0.0.1')
     parser.add_argument('--port', type=int, default=8000)
     args = parser.parse_args(argv)
@@ -178,6 +207,7 @@ def main(argv=None):
     except KeyboardInterrupt:
         print('\nServer stopped.')
     finally:
+        # Luôn giải phóng socket, kể cả khi người dùng dừng bằng Ctrl+C.
         server.server_close()
     return 0
 

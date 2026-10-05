@@ -1,6 +1,6 @@
 # Ảnh sản phẩm thật
 
-`catalog/` chứa 20 ảnh sản phẩm từ website/CDN chính hãng Apple, ASUS và Logitech, không dùng ảnh sinh bởi AI. Mỗi sản phẩm trong `../products.json` có đường dẫn `image`, trang `source_url` và link gốc `image_source_url`.
+`CodePython/data/images/catalog/` ở gốc dự án chứa 20 ảnh sản phẩm từ website/CDN chính hãng Apple, ASUS và Logitech, không dùng ảnh sinh bởi AI. Mỗi sản phẩm trong `CodePython/data/products.json` có đường dẫn `image`, trang `source_url` và link gốc `image_source_url`. Folder tài nguyên này chỉ giữ hướng dẫn và các SVG cũ không dùng khi chạy web.
 
 Xem [PRODUCT_SOURCES.md](../PRODUCT_SOURCES.md) để kiểm tra nguồn từng ảnh. Ảnh được lưu cục bộ để giao diện không phụ thuộc vào hotlink. Các tên/model/màu được đối chiếu với nguồn; giá và tồn kho vẫn là demo.
 

@@ -1,15 +1,18 @@
-"""Console presentation; storage access belongs to the injected services."""
+"""Giao diện console; truy cập kho dữ liệu thông qua các service được truyền vào."""
 
 
 class SearchUI:
+    """Điều phối nhập/xuất, không trực tiếp đọc JSON hay tính điểm sản phẩm."""
+
     def __init__(self, query_service, speech_service, search_service, ranking_service):
+        """Nhận các dịch vụ cần dùng cho ba chế độ tìm kiếm."""
         self.query_service = query_service
         self.speech_service = speech_service
         self.search_service = search_service
         self.ranking_service = ranking_service
 
     def display_results(self, results, top_k=None, score_label="score"):
-        """Print products with their ranking scores and optional display limit."""
+        """In thông tin sản phẩm và điểm, hỗ trợ giới hạn số kết quả hiển thị."""
         if not results:
             print("No products found.")
             return
@@ -24,12 +27,14 @@ class SearchUI:
             )
 
     def _retrieve_rank_display(self, query, top_k=None, score_label="score"):
+        """Luồng dùng chung: tìm ứng viên → xếp hạng → hiển thị kết quả."""
         candidates = self.search_service.search(query)
         results = self.ranking_service.rank(candidates, top_k=top_k)
         self.display_results(results, score_label=score_label)
         return results
 
     def search_text(self, text, top_k=None):
+        """Tạo truy vấn text và báo lỗi đầu vào thân thiện thay vì in traceback."""
         print("\n=== TEXT SEARCH ===")
         print("Processing mode: Text")
         print("Input:", text)
@@ -41,6 +46,7 @@ class SearchUI:
             return []
 
     def search_voice(self, audio_input, top_k=None):
+        """Mô phỏng phiên âm, tạo truy vấn voice rồi chạy luồng tìm kiếm chung."""
         print("\n=== VOICE SEARCH ===")
         print("Processing mode: Voice (simulated speech-to-text)")
         print("Voice input:", audio_input)
@@ -54,6 +60,7 @@ class SearchUI:
             return []
 
     def search_image(self, embedding, top_k=None):
+        """Tìm bằng vector nhân tạo và hiển thị điểm với nhãn similarity."""
         print("\n=== IMAGE SEARCH ===")
         print("Processing mode: Image (artificial embedding; cosine similarity)")
         print("Query embedding:", embedding)

@@ -1,1 +1,1 @@
-"""Product storage and artificial image-vector data."""
+"""Tầng dữ liệu: kho sản phẩm, kho đơn hàng và chỉ mục vector ảnh mô phỏng."""

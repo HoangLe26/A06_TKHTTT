@@ -2,7 +2,9 @@
 
 Prototype Python cho Assignment 06, Task 5: kho sản phẩm, tìm kiếm văn bản, giọng nói mô phỏng, tìm kiếm bằng vector ảnh và xếp hạng kết quả. Chạy mặc định sẽ trình diễn cả ba cách tìm kiếm, phù hợp để demo Task 6.
 
-Đã tích hợp thêm giao diện HTML trong `../FrontEnd`. Từ folder gốc chạy `.\.venv\Scripts\python.exe CodePython/web_server.py`, rồi mở `http://127.0.0.1:8000/`. Khi đang ở `CodePython`, chạy `python web_server.py`. Xem `../FrontEnd/README.md` để biết cách sử dụng và giới hạn tương thích.
+Tài liệu này đã chuyển vào `tainguyen/CodePython`. Các đường dẫn code và lệnh chạy bên dưới vẫn tính từ folder chạy `CodePython` ở gốc dự án, không phải folder chứa README. Test và `evaluate.py` đã chuyển vào `tainguyen`; xem [hướng dẫn tài nguyên](../README.md).
+
+Đã tích hợp thêm giao diện HTML trong `FrontEnd` ở gốc dự án. Từ folder gốc chạy `.\.venv\Scripts\python.exe CodePython/web_server.py`, rồi mở `http://127.0.0.1:8000/`. Khi đang ở `CodePython`, chạy `python web_server.py`. Xem [hướng dẫn giao diện](../FrontEnd/README.md) để biết cách sử dụng và giới hạn tương thích.
 
 ## Cài đặt và chạy
 
@@ -45,7 +47,6 @@ Mỗi kết quả hiển thị tên, category, color, price, stock và điểm. 
 ```text
 CodePython/
 ├── main.py                         # Composition root, CLI và demo
-├── evaluate.py                     # Đánh giá truy vấn và ví dụ giới hạn
 ├── web_server.py                   # Server local phục vụ frontend và API JSON
 ├── presentation/
 │   ├── __init__.py
@@ -68,9 +69,7 @@ CodePython/
 │   ├── products.json                # 20 sản phẩm thật và embeddings nhân tạo
 │   ├── orders.json                  # Ba đơn mẫu cho giao diện Order Search
 │   └── images/                      # Ảnh chính hãng trong catalog/; không mã hóa ảnh
-├── tests/                          # 19 kiểm thử API/pipeline bằng unittest
-├── requirements.txt
-└── README.md
+└── requirements.txt
 ```
 
 Luồng xử lý: `SearchUI → QueryService → SearchService → RankingService → SearchUI`. Với giọng nói, `SpeechService.transcribe()` chạy trước bước tạo truy vấn. `SearchService` lấy dữ liệu qua `ProductRepository` và `VectorIndex`, dùng `ImageService` để tính điểm ảnh. Presentation không đọc JSON trực tiếp; truy xuất và xếp hạng thuộc hai service riêng.
@@ -89,7 +88,7 @@ Thư mục `data/images/catalog/` lưu 20 ảnh sản phẩm từ Apple, ASUS v�
 Từ thư mục `CodePython`:
 
 ```powershell
-python -m unittest discover -s tests -v
+python -m unittest discover -s ../tainguyen/CodePython/tests -v
 python main.py --mode text --query ""
 python main.py --mode text --query "zzzz_no_match"
 python main.py --mode image --embedding 0 0 0 --top-k 3
@@ -99,9 +98,9 @@ python main.py --mode image --embedding invalid 0.10 0.20
 
 Query rỗng được xử lý có kiểm soát; query không khớp trả danh sách rỗng. Vector không không gây chia cho 0. Hai lệnh cuối minh họa lỗi kích thước và lỗi thành phần không phải số.
 
-Báo cáo tích hợp và kiểm thử web ở `../FrontEnd/INTEGRATION_NOTES.md`. Dùng `main.py` và `evaluate.py` để chạy demo và đánh giá console.
+Báo cáo tích hợp và kiểm thử web ở [INTEGRATION_NOTES.md](../FrontEnd/INTEGRATION_NOTES.md). Dùng `main.py` để chạy demo; chạy `python ../tainguyen/CodePython/evaluate.py` từ folder `CodePython` để đánh giá console.
 
-Chạy `python evaluate.py` để in bảng đánh giá 11 truy vấn. Dữ liệu hiện tại đạt 10/11 (90,91%): 10 tình huống trong khả năng prototype và 1 tình huống có yêu cầu lọc giá mà thuật toán từ khóa chưa hỗ trợ. Đây là tập ví dụ nhỏ được chọn thủ công, không phải độ chính xác trên dữ liệu thực tế. API web có filter `max_price` rõ ràng; chưa phân tích điều kiện giá trong câu tìm kiếm tự nhiên.
+Chạy `python tainguyen/CodePython/evaluate.py` từ folder gốc để in bảng đánh giá 11 truy vấn. Dữ liệu hiện tại đạt 10/11 (90,91%): 10 tình huống trong khả năng prototype và 1 tình huống có yêu cầu lọc giá mà thuật toán từ khóa chưa hỗ trợ. Đây là tập ví dụ nhỏ được chọn thủ công, không phải độ chính xác trên dữ liệu thực tế. API web có filter `max_price` rõ ràng; chưa phân tích điều kiện giá trong câu tìm kiếm tự nhiên.
 
 ## Thay đổi dữ liệu và giới hạn
 

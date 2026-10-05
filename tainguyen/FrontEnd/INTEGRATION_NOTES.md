@@ -1,13 +1,15 @@
 # Báo cáo tích hợp ngày 05/10/2026
 
+Sau khi sắp xếp tài nguyên: backend test nằm ở `tainguyen/CodePython/tests`; DOM test và package npm nằm ở `tainguyen/FrontEnd`; script tải ảnh nằm ở `tainguyen/CodePython/data/download_product_images.py`. Code chạy vẫn giữ trong `CodePython` và `FrontEnd` ở gốc.
+
 ## Kết quả kiểm tra thực tế
 
 Môi trường: Windows, Python 3.13.2, NumPy 2.5.3, Node 20.19.2. Giao diện dùng HTML/JavaScript hiện có, backend dùng HTTP server thư viện chuẩn Python, không thêm framework Python.
 
 | Nhóm | Lệnh | Kết quả |
 | --- | --- | --- |
-| API và search pipeline | `python -m unittest discover -s CodePython/tests -v` | 19/19 test methods đạt, nhiều trường hợp con |
-| JavaScript DOM + API thật | `npm test` trong `FrontEnd`, server ở cổng 8000 | 73/73 kiểm tra thao tác đạt |
+| API và search pipeline | `python -m unittest discover -s tainguyen/CodePython/tests -v` | 19/19 test methods đạt, nhiều trường hợp con |
+| JavaScript DOM + API thật | `npm test` trong `tainguyen/FrontEnd`, server ở cổng 8000 | 73/73 kiểm tra thao tác đạt |
 | Cú pháp JavaScript | `node --check` với 5 file assets JS | Đạt |
 
 Các test DOM dùng [jsdom](https://github.com/jsdom/jsdom), mô phỏng DOM và chạy các script local với API Python thật. Tài nguyên ngoài CDN được bỏ qua trong test. Dialog, scroll, object URL preview và print được thay bằng hàm mô phỏng để kiểm tra luồng; chúng không chứng minh việc render/giải mã ảnh/in thực tế của browser.
@@ -70,4 +72,4 @@ Bấm danh mục trên Text Search xóa từ khóa và giới hạn top-k cũ đ
 
 Đã thêm kiểm tra DOM bấm đủ năm nút khi ô tìm kiếm còn `phone` và giới hạn Top 3; kiểm tra kết quả đúng danh mục, reset đầu vào, All Categories và tìm từ khóa sau khi duyệt. Trên Windows, server sử dụng cổng độc quyền để ngăn nhiều instance cùng cổng khiến request tới backend cũ. Test xác minh không thể mở server thứ hai trên cổng đang được phục vụ. Các instance cũ của đúng dự án đã được dừng sau khi cấp quyền; server mới đã chạy và kiểm tra tại cổng 8000.
 
-Quá trình tải ảnh đã xử lý ACL riêng của thư mục tạm trên Windows: copy dữ liệu vào thư mục ảnh trước khi thay file để giữ quyền đọc bình thường. Có script tải lại `CodePython/data/download_product_images.py` (cần internet/curl); không cần chạy lại khi sử dụng giao diện.
+Quá trình tải ảnh đã xử lý ACL riêng của thư mục tạm trên Windows: copy dữ liệu vào thư mục ảnh trước khi thay file để giữ quyền đọc bình thường. Có script tải lại `tainguyen/CodePython/data/download_product_images.py` (cần internet/curl); không cần chạy lại khi sử dụng giao diện.

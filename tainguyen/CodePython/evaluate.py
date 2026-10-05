@@ -1,9 +1,13 @@
 """Print a repeatable small evaluation, including a known price-filter limitation."""
 
-if __package__:
-    from .main import build_ui
-else:
-    from main import build_ui
+from pathlib import Path
+import sys
+
+WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
+if str(WORKSPACE_ROOT) not in sys.path:
+    sys.path.insert(0, str(WORKSPACE_ROOT))
+
+from CodePython.main import build_ui
 
 
 def main():

@@ -2,7 +2,7 @@
 
 Catalog có đúng 20 sản phẩm, mỗi nhóm 5 sản phẩm. Tên/model và ảnh lấy từ nguồn chính hãng Apple, ASUS và Logitech; không có ảnh sinh bởi AI. Giá USD, tồn kho, đơn mẫu và vector 3 chiều là dữ liệu mô phỏng, không phải thông tin bán hàng hiện hành.
 
-Ngày đối chiếu nguồn: 05/10/2026. Ảnh lưu cục bộ trong `images/catalog/`. Bấm **View Details → Official product source** trên giao diện để mở nguồn sản phẩm.
+Ngày đối chiếu nguồn: 05/10/2026. Ảnh chạy ứng dụng vẫn lưu trong `CodePython/data/images/catalog/` ở gốc dự án; tài liệu này đã chuyển vào `tainguyen`. Bấm **View Details → Official product source** trên giao diện để mở nguồn sản phẩm.
 
 ## Điện thoại
 
@@ -50,4 +50,4 @@ Ngày đối chiếu nguồn: 05/10/2026. Ảnh lưu cục bộ trong `images/ca
 
 Ảnh thật không đồng nghĩa với embedding thật: tìm kiếm ảnh hiện vẫn nhận vector gán thủ công; ảnh tải lên chỉ dùng preview cục bộ. Ảnh, nhãn hiệu và thiết kế thuộc nhà sản xuất. Ghi nguồn không cấp phép sử dụng thương mại; cần kiểm tra quyền sử dụng trước khi công khai hoặc kinh doanh.
 
-Đổi sản phẩm tại `products.json`, giữ ID duy nhất và cập nhật ảnh, nguồn, `search_terms`. Có thể tải lại ảnh đã khai báo bằng `python CodePython/data/download_product_images.py` từ folder gốc (cần internet và curl). Dừng rồi chạy lại server sau khi thay JSON.
+Đổi sản phẩm tại `CodePython/data/products.json`, giữ ID duy nhất và cập nhật ảnh, nguồn, `search_terms`. Có thể tải lại ảnh đã khai báo bằng `python tainguyen/CodePython/data/download_product_images.py` từ folder gốc (cần internet và curl). Dừng rồi chạy lại server sau khi thay JSON.

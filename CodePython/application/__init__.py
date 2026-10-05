@@ -1,1 +1,1 @@
-"""Query normalization, multimodal retrieval, and ranking services."""
+"""Tầng xử lý nghiệp vụ: chuẩn hóa truy vấn, tìm kiếm và xếp hạng kết quả."""

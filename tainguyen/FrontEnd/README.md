@@ -1,6 +1,6 @@
 # Giao diện nối với dự án Python
 
-Bốn trang HTML trong folder này đã được nối với API trong `CodePython`. Giữ phong cách vintage của giao diện gốc; kết quả sản phẩm, thứ hạng, số lượng ứng viên và thời gian xử lý hiện lấy từ backend. Các file `screen.png` là ảnh tham khảo thiết kế gốc, không phải ảnh chụp phiên bản đã tích hợp.
+Bốn trang HTML chạy vẫn nằm trong `FrontEnd` ở gốc dự án và đã được nối với API trong `CodePython`. Hướng dẫn này, bộ test và các file `screen.png` đã chuyển vào `tainguyen/FrontEnd`. Các ảnh này chỉ tham khảo thiết kế gốc, không phải ảnh chụp phiên bản đã tích hợp.
 
 ## Chạy ứng dụng
 
@@ -33,7 +33,7 @@ Không cần Node/npm để chạy ứng dụng. Không mở `code.html` bằng 
 - Trang voice bỏ nhãn Whisper, dữ liệu âm thanh PCM và confidence giả. Đầu vào là văn bản đã phiên âm; waveform chỉ minh họa.
 - Trang image bỏ nhãn ViT/TensorRT, vector 512 chiều và ROI giả. Vector hiện có 3 chiều, được gán thủ công; similarity không phải xác suất nhận dạng đúng.
 - Bổ sung `orders.json` với ba đơn mẫu và `OrderService` để trang Order Search lấy dữ liệu thực. `OrderRepository` giữ giao diện dùng trong bộ nhớ cũ và thêm cách tải JSON.
-- Hình sản phẩm là 20 ảnh chính hãng lưu cục bộ trong `CodePython/data/images/catalog/`, không sinh bằng AI. Mỗi sản phẩm có link nguồn chính hãng trong View Details; danh sách nguồn nằm ở `CodePython/data/PRODUCT_SOURCES.md`. Mức giá USD dùng để trình diễn, không phải bảng giá bán thật.
+- Hình sản phẩm là 20 ảnh chính hãng lưu cục bộ trong `CodePython/data/images/catalog/`, không sinh bằng AI. Mỗi sản phẩm có link nguồn chính hãng trong View Details; danh sách nguồn nằm ở `tainguyen/CodePython/data/PRODUCT_SOURCES.md`. Mức giá USD dùng để trình diễn, không phải bảng giá bán thật.
 
 ## Các phần còn giới hạn
 
@@ -52,13 +52,13 @@ Server mặc định chỉ lắng nghe trên máy local `127.0.0.1`; đây là s
 Kiểm thử backend từ folder gốc:
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s CodePython/tests -v
+.\.venv\Scripts\python.exe -m unittest discover -s tainguyen/CodePython/tests -v
 ```
 
 Kiểm thử JavaScript/DOM là tùy chọn, cần Node 18 trở lên và npm. Giữ server Python đang chạy ở cổng 8000, rồi:
 
 ```powershell
-cd FrontEnd
+cd tainguyen/FrontEnd
 npm ci --ignore-scripts
 npm test
 ```
