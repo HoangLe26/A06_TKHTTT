@@ -58,7 +58,7 @@ Ví dụ request tìm kiếm ảnh:
 
 Giá USD/tồn kho/đơn hàng vẫn là demo; các vector không được trích xuất từ ảnh. Các preset lấy tên, ảnh và vector trực tiếp từ API/catalog, không hardcode dữ liệu sản phẩm cũ. Đơn O001/O002/O003 tham chiếu sản phẩm mới và dùng đơn giá demo tương ứng.
 
-Có hỗ trợ từ khóa danh mục tiếng Việt có dấu/không dấu. Cụm `ban phim` được đổi sang `keyboard` trước đối chiếu để không khớp nhầm `bang` trong `may tinh bang`. Đã thử bộ lọc tồn kho loại bỏ ID15/20 có stock 0. Console demo chạy đủ ba chế độ; evaluate.py đạt 10/11, giữ ví dụ thất bại về phân tích điều kiện giá tự nhiên.
+Demo dùng truy vấn tiếng Anh. Đã bỏ dictionary alias, vòng lặp chuyển đổi cụm từ tiếng Việt và các từ khóa tiếng Việt trong catalog; giữ các từ khóa tiếng Anh. Kiểm thử danh mục/phụ kiện dùng `phone`, `smartphone`, `tablet`, `laptop`, `notebook`, `accessories`, `mouse`, `keyboard`, gồm trường hợp chữ hoa và dấu câu. Đã thử bộ lọc tồn kho loại bỏ ID15/20 có stock 0. Console demo chạy đủ ba chế độ; evaluate.py đạt 10/11, giữ ví dụ thất bại về phân tích điều kiện giá tự nhiên.
 
 ## Sửa Filter Facets
 

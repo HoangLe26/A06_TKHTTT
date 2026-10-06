@@ -210,12 +210,12 @@ class WebIntegrationTests(unittest.TestCase):
                 self.assertGreater(len(body), 1000)
                 self.assertEqual(body, (PROJECT_ROOT / 'data' / 'images' / product['image']).read_bytes())
 
-    def test_vietnamese_category_and_accessory_queries(self):
-        for query, category, count in [('điện thoại', 'phone', 5), ('dien thoai', 'phone', 5),
-                                       ('máy tính bảng', 'tablet', 5), ('may tinh bang', 'tablet', 5),
-                                       ('laptop', 'laptop', 5), ('chuột', 'accessory', 3),
-                                       ('chuot', 'accessory', 3), ('bàn phím', 'accessory', 2),
-                                       ('ban phim', 'accessory', 2)]:
+    def test_english_category_and_accessory_queries(self):
+        for query, category, count in [('phone', 'phone', 5), ('smartphone', 'phone', 5),
+                                       ('tablet', 'tablet', 5), ('laptop', 'laptop', 5),
+                                       ('notebook', 'laptop', 5), ('accessories', 'accessory', 5),
+                                       ('mouse', 'accessory', 3), ('keyboard', 'accessory', 2),
+                                       ('KEYBOARD.', 'accessory', 2)]:
             with self.subTest(query=query):
                 result = self.search({'type': 'text', 'query': query})
                 self.assertEqual(result['returned_count'], count)

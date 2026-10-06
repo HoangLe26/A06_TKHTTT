@@ -78,7 +78,7 @@ Luồng xử lý: `SearchUI → QueryService → SearchService → RankingServic
 
 ## Cách tìm kiếm và xếp hạng
 
-- **Văn bản:** chuyển query và chuỗi `name + category + color + search_terms` thành chữ thường, tách các từ bằng regex để bỏ dấu câu do API phiên âm thêm vào. Mỗi từ xuất hiện trong chuỗi sản phẩm đóng góp 1 điểm. Đây là đối chiếu chuỗi con theo từ khóa, nên có thể trả về sản phẩm chỉ khớp một phần truy vấn. Ví dụ `phone` trả 5 điện thoại. Có thêm từ khóa danh mục tiếng Việt có dấu/không dấu và từ khóa `chuột`, `bàn phím`.
+- **Văn bản:** chuyển query và chuỗi `name + category + color + search_terms` thành chữ thường, tách các từ bằng regex để bỏ dấu câu do API phiên âm thêm vào. Mỗi từ xuất hiện trong chuỗi sản phẩm đóng góp 1 điểm. Đây là đối chiếu chuỗi con theo từ khóa, nên có thể trả về sản phẩm chỉ khớp một phần truy vấn. Demo dùng truy vấn và từ khóa tiếng Anh, ví dụ `phone`, `tablet`, `laptop`, `mouse`, `keyboard`; không có bước chuyển đổi alias ngôn ngữ.
 - **Giọng nói:** web nhận bản ghi micro, FFmpeg chuyển sang PCM và Vosk tiếng Anh phiên âm local trước khi tìm kiếm. Console/ô nhập tay vẫn nhận transcript, ví dụ `find laptop`, để dùng chung cơ chế truy xuất. Không gọi dịch vụ cloud hay dùng API key.
 - **Ảnh:** JPEG/PNG → CLIP ViT-B/32 local CPU → vector chuẩn hóa 512 chiều → cosine similarity với ảnh sản phẩm → xếp hạng. Có thể chạy console với `--image-file` hoặc nhập vector CLIP đủ 512 số bằng `--embedding`. Web hiển thị nhãn dự đoán và cho xuất JSON vector.
 - **Xếp hạng:** sắp xếp ứng viên theo điểm từ cao xuống thấp. Điểm bằng nhau giữ nguyên thứ tự ứng viên để kết quả ổn định. Giới hạn `top_k` áp dụng sau khi xếp hạng. Điểm keyword và cosine thuộc hai thang đo khác nhau, không dùng để so sánh chéo các chế độ.

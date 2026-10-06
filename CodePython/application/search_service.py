@@ -32,16 +32,6 @@ class SearchService:
         if not isinstance(query_text, str):
             raise ValueError("Text search query must be a string.")
         normalized = query_text.lower()
-        # Đổi cụm danh mục tiếng Việt sang tiếng Anh trước khi tách từ.
-        # Dùng ranh giới từ để "ban phim" không bị khớp nhầm với "bang".
-        aliases = {'điện thoại': 'phone', 'dien thoai': 'phone',
-                   'máy tính bảng': 'tablet', 'may tinh bang': 'tablet',
-                   'máy tính xách tay': 'laptop', 'may tinh xach tay': 'laptop',
-                   'bàn phím': 'keyboard', 'ban phim': 'keyboard',
-                   'chuột': 'mouse', 'chuot': 'mouse',
-                   'phụ kiện': 'accessory', 'phu kien': 'accessory'}
-        for phrase, category in aliases.items():
-            normalized = re.sub(r'(?<!\w)' + re.escape(phrase) + r'(?!\w)', category, normalized)
         # API phiên âm thường thêm dấu câu: "Find laptop." vẫn phải khớp "laptop".
         words = re.findall(r'\w+', normalized)
         if not words:
