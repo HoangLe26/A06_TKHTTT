@@ -44,7 +44,8 @@ def main():
         score = f'{results[0][1]:.4f}' if results else '-'
         success = actual_id == expected_id
         passed += success
-        print(f'| {mode} | {value} | {expected_id} | {actual_id} | {score} | {"Yes" if success else "No"} |')
+        display_value = f'CLIP vector ({len(value)} dimensions)' if mode == 'image' else value
+        print(f'| {mode} | {display_value} | {expected_id} | {actual_id} | {score} | {"Yes" if success else "No"} |')
     print(f'\nSuccessful queries: {passed}/{len(cases)} ({passed / len(cases):.2%})')
     print('Small hand-selected demonstration set; this is not a real-world accuracy estimate.')
     print('Known failure: price constraints are not interpreted by keyword matching.')

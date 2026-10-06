@@ -6,7 +6,7 @@
 <div class="flex flex-wrap items-center gap-space-md font-label-sm text-label-sm text-on-surface-variant">
 <span class="flex items-center gap-space-xs">
 <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-          Transcript Simulation · No Microphone
+          English Voice Search · Record &amp; Transcribe
         </span>
 <span class="hidden sm:inline text-outline-variant">·</span>
 <span class="flex items-center gap-space-xs">
@@ -23,11 +23,11 @@
 <div class="flex items-center justify-between overflow-x-auto pb-1 text-on-surface-variant font-label-sm text-label-sm border-b border-outline-variant/30 py-space-xs">
 <div class="flex items-center gap-2 shrink-0 text-on-surface font-semibold">
 <span class="material-symbols-outlined text-[16px] text-primary">mic</span>
-<span>1. Transcript Input</span>
+<span>1. Microphone Recording</span>
 </div>
 <span class="text-outline-variant">→</span>
 <div class="flex items-center gap-2 shrink-0">
-<span>2. SpeechService</span>
+<span>2. Vosk Local STT</span>
 </div>
 <span class="text-outline-variant">→</span>
 <div class="flex items-center gap-2 shrink-0 text-primary font-medium">
@@ -59,31 +59,38 @@
 <div class="lg:col-span-7 bg-surface-container-lowest p-space-lg rounded-2xl border border-outline-variant/40 flex flex-col justify-between gap-space-md shadow-sm">
 <div class="flex items-start justify-between">
 <div>
-<span class="font-label-sm text-label-sm text-primary tracking-widest uppercase block mb-1">Voice Simulation Studio</span>
+<span class="font-label-sm text-label-sm text-primary tracking-widest uppercase block mb-1">Voice Search Studio</span>
 <h2 class="font-headline-md text-headline-md text-on-surface">Your Spoken Query</h2>
 </div>
 <span class="px-3 py-1 bg-surface-container text-on-surface-variant font-label-sm text-label-sm rounded-full border border-outline-variant/30">
-          Simulated SpeechService
+          English · Vosk Offline
         </span>
 </div>
 <!-- Input Display Pill -->
+<div class="flex flex-wrap items-center gap-space-sm">
+<button id="voice-record-btn" type="button" disabled class="inline-flex items-center justify-center gap-space-xs px-space-lg py-2.5 bg-primary text-on-primary rounded-full font-label-md"><span class="material-symbols-outlined" aria-hidden="true">mic</span><span>Record</span></button>
+<button id="voice-stop-btn" type="button" disabled class="inline-flex items-center justify-center gap-space-xs px-space-md py-2.5 bg-surface-container border border-outline-variant/40 rounded-full font-label-md"><span class="material-symbols-outlined" aria-hidden="true">stop</span><span>Stop &amp; Search</span></button>
+<span id="voice-record-time" class="font-label-sm" aria-live="off">0 / 30 seconds</span>
+</div>
+<p id="voice-api-status" class="font-body-sm text-on-surface-variant" role="status" aria-live="polite">Checking local voice model...</p>
+<p class="font-body-sm text-on-surface-variant">Speak one short English sentence, for example "find laptop". Stop sends the recording only to Python on this computer. Vosk transcribes offline and searches automatically. No API key or cloud service is used.</p>
 <div class="bg-surface-container-low p-space-md rounded-xl border border-outline-variant/30 flex items-center justify-between gap-space-md">
 <div class="flex items-center gap-space-sm flex-1 min-w-0">
 <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined text-[20px]">graphic_eq</span>
 </div>
 <div class="flex flex-col min-w-0">
-<span class="font-label-sm text-label-sm text-on-surface-variant"><label for="voice-input">Already-transcribed voice text</label></span>
-<input id="voice-input" class="font-headline-sm text-headline-sm text-on-surface bg-transparent outline-none w-full" type="text" value="find laptop" placeholder="Type the words you would say">
+<span class="font-label-sm text-label-sm text-on-surface-variant"><label for="voice-input">Transcript (editable after recording)</label></span>
+<input id="voice-input" class="font-headline-sm text-headline-sm text-on-surface bg-transparent outline-none w-full" type="text" value="" placeholder="Record a query, or type one here">
 </div>
 </div>
-<span class="shrink-0 px-2.5 py-1 bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm rounded-md border border-outline-variant/40">Text Input</span>
+<span class="shrink-0 px-2.5 py-1 bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm rounded-md border border-outline-variant/40">Transcript</span>
 </div>
 <!-- Subtle, elegant acoustic waveform representation -->
 <div class="bg-surface-container-low/60 p-space-md rounded-xl border border-outline-variant/20 flex flex-col gap-space-xs">
 <div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
 <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Illustrative waveform</span>
-<span>No audio captured</span>
+<span id="voice-record-state">Microphone off</span>
 </div>
 <div class="w-full h-16 flex items-center justify-center overflow-hidden py-1">
 <svg class="w-full h-full text-primary" preserveAspectRatio="none" viewBox="0 0 600 60">
@@ -95,12 +102,12 @@
 <!-- Action Trigger -->
 <div class="flex items-center justify-between gap-space-sm pt-space-xs">
 <button class="inline-flex items-center justify-center gap-space-xs px-space-lg py-2.5 bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md rounded-full shadow-xs transition-colors" id="simulateVoiceBtn" type="button">
-<span class="material-symbols-outlined text-[18px]">mic</span>
-<span>Simulate Voice Search</span>
+<span class="material-symbols-outlined text-[18px]">search</span>
+<span>Search Transcript</span>
 </button>
 <span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
 <span class="material-symbols-outlined text-[16px] text-secondary">check_circle</span>
-          Transcript passed through unchanged
+          Edit the transcript if needed
         </span>
 </div>
 <div class="flex flex-wrap items-center gap-space-xs text-body-sm" id="voice-controls">
@@ -109,7 +116,7 @@
 <label>Show <select id="voice-top-k" class="bg-surface rounded-lg border border-outline-variant/40 px-2 py-1"><option value="">All results</option><option value="3">Top 3</option><option value="5">Top 5</option></select></label>
 <button id="voice-clear-btn" type="button" class="px-space-sm py-1 bg-surface-container rounded-full">Clear</button>
 </div>
-<p id="voice-status" role="status" aria-live="polite" class="text-body-sm text-on-surface-variant">Ready to search with a simulated transcript.</p>
+<p id="voice-status" role="status" aria-live="polite" class="text-body-sm text-on-surface-variant">Record an English query, or type a transcript to search.</p>
 </div>
 <!-- Right: Compact Processing Telemetry Summary (5 Cols) -->
 <div class="lg:col-span-5 bg-surface-container-lowest p-space-lg rounded-2xl border border-outline-variant/40 flex flex-col justify-between gap-space-md shadow-sm">
@@ -126,7 +133,7 @@
 <div class="space-y-space-xs py-space-xs">
 <div class="flex items-baseline justify-between py-2 border-b border-outline-variant/20">
 <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Input Mode</span>
-<span class="font-label-md text-label-md text-on-surface font-semibold">Voice (Simulated Transcript)</span>
+<span id="voice-input-mode" class="font-label-md text-label-md text-on-surface font-semibold">Microphone / typed transcript</span>
 </div>
 <div class="flex items-baseline justify-between py-2 border-b border-outline-variant/20">
 <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Transcribed Text</span>
@@ -138,7 +145,7 @@
 </div>
 <div class="flex items-baseline justify-between py-2">
 <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Processing Pipeline</span>
-<span class="font-label-sm text-label-sm text-on-surface text-right font-medium">Simulated STT + Text Search</span>
+<span class="font-label-sm text-label-sm text-on-surface text-right font-medium">Vosk Offline → Text Search → Ranking</span>
 </div>
 </div>
 <!-- Subtle Warm Status Footer -->
@@ -174,4 +181,4 @@
 </div>
 <div id="voice-results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg" aria-busy="false"></div>
 </section>
-</div></main><footer class="w-full bg-surface-container-low border-t border-outline-variant/40 py-space-lg mt-space-xl"><div class="w-full px-margin flex flex-col md:flex-row items-center justify-between gap-space-md font-label-sm text-label-sm text-on-surface-variant"><div>Multimodal Search · Simulated Voice Search</div><div class="flex items-center gap-space-lg"><span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Voice → Keyword Retrieval</span><span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>No Real Speech Model</span></div></div></footer></body></html>
+</div></main><footer class="w-full bg-surface-container-low border-t border-outline-variant/40 py-space-lg mt-space-xl"><div class="w-full px-margin flex flex-col md:flex-row items-center justify-between gap-space-md font-label-sm text-label-sm text-on-surface-variant"><div>Multimodal Search · Voice Search</div><div class="flex items-center gap-space-lg"><span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span>Voice → Keyword Retrieval</span><span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>Vosk · Offline · No API Key</span></div></div></footer></body></html>

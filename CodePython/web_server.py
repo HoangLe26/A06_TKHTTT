@@ -7,15 +7,20 @@ import mimetypes
 import os
 from pathlib import Path
 import socket
+import threading
 from urllib.parse import unquote, urlsplit
 
 # Chọn kiểu import phù hợp khi chạy dạng package hoặc mở file trực tiếp.
 if __package__:
+    from .application.audio_transcription_service import TranscriptionError
+    from .application.image_embedding_service import ImageRecognitionError
     from .application.order_service import OrderService
     from .application.web_search_service import WebSearchService
     from .data.order_repository import OrderRepository
     from .main import build_ui
 else:
+    from application.audio_transcription_service import TranscriptionError
+    from application.image_embedding_service import ImageRecognitionError
     from application.order_service import OrderService
     from application.web_search_service import WebSearchService
     from data.order_repository import OrderRepository
@@ -34,6 +39,9 @@ PAGES = {
 }
 # Giới hạn phần thân yêu cầu JSON ở 64 KiB để tránh đọc dữ liệu quá lớn.
 MAX_BODY = 65536
+# Bản ghi mã hóa base64 lớn hơn dữ liệu nhị phân; giới hạn riêng cho tuyến voice.
+MAX_AUDIO_BODY = 3 * 1024 * 1024
+MAX_IMAGE_BODY = 17 * 1024 * 1024
 
 
 def build_services():
@@ -65,6 +73,10 @@ class SearchHTTPServer(ThreadingHTTPServer):
         self.search_service = search_service
         self.order_service = order_service
         self.frontend_root = Path(frontend_root)
+        # Chỉ cho một lần phiên âm chạy cùng lúc để hạn chế yêu cầu API trùng lặp.
+        self.audio_slot = threading.BoundedSemaphore(1)
+        # Mỗi lần chỉ xử lý một ảnh để tránh nhiều inference CPU tranh tài nguyên.
+        self.image_slot = threading.BoundedSemaphore(1)
         super().__init__(address, SearchRequestHandler)
 
 
@@ -128,13 +140,16 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
                 return self._static(self.server.frontend_root / 'assets', path[8:], {'.js', '.css', '.svg'}, head)
             if path.startswith('/product-images/'):
                 return self._static(IMAGE_ROOT, path[16:], {'.svg', '.png', '.jpg', '.jpeg', '.webp'}, head)
-            # API kiểm tra trạng thái trả số sản phẩm/đơn và chế độ mô phỏng.
+            # API trạng thái chỉ trả thông tin cấu hình voice, không công khai key.
             if path == '/api/health':
                 catalog = self.server.search_service.catalog()
                 return self._send(200, {'status': 'ok', 'product_count': len(catalog['products']),
                     'order_count': len(self.server.order_service.all_orders()),
                     'vector_dimension': catalog['vector_dimension'],
-                    'voice_mode': 'simulated', 'image_mode': 'artificial vectors'}, head=head)
+                    'voice_mode': 'offline vosk + typed transcript',
+                    'voice_api': self.server.search_service.speech_service.audio_configuration(),
+                    'image_mode': 'offline CLIP image embeddings',
+                    'image_api': self.server.search_service.image_configuration()}, head=head)
             # Các tuyến dữ liệu chỉ đọc: catalog, danh sách/chi tiết đơn và sản phẩm.
             if path == '/api/catalog':
                 return self._send(200, self.server.search_service.catalog(), head=head)
@@ -151,7 +166,7 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
                 result = self.server.search_service.product(product_id)
                 return self._send(200, {'product': result}, head=head) if result else self._send(404, {'error': 'Product not found.'}, head=head)
             # Tìm kiếm cần nhận JSON đầu vào nên không hỗ trợ GET.
-            if path == '/api/search':
+            if path in {'/api/search', '/api/voice-search', '/api/image-search'}:
                 return self._send(405, {'error': 'Use POST for search.'}, head=head)
             return self._send(404, {'error': 'Page or endpoint not found.'}, head=head)
         except ValueError as exc:
@@ -160,27 +175,66 @@ class SearchRequestHandler(BaseHTTPRequestHandler):
             return self._send(500, {'error': 'Unable to read application files.'}, head=head)
 
     def do_POST(self):
-        """Nhận JSON tìm kiếm, kiểm tra kích thước/định dạng rồi gọi service."""
-        if urlsplit(self.path).path != '/api/search':
+        """Nhận truy vấn hoặc bản ghi base64; kiểm tra trước khi tìm kiếm/gọi API."""
+        path = urlsplit(self.path).path
+        if path not in {'/api/search', '/api/voice-search', '/api/image-search'}:
             return self._send(404, {'error': 'Endpoint not found.'})
-        # Không nhận form hoặc dữ liệu ảnh; endpoint này chỉ nhận application/json.
+        is_audio = path == '/api/voice-search'
+        is_image = path == '/api/image-search'
+        if is_audio or is_image:
+            # Chặn website khác gửi âm thanh để chiếm tài nguyên server local.
+            host = self.headers.get('Host', '').lower()
+            allowed_hosts = {f'127.0.0.1:{self.server.server_port}', f'localhost:{self.server.server_port}'}
+            origin = self.headers.get('Origin')
+            if host not in allowed_hosts or (origin is not None and origin != 'http://' + host):
+                return self._send(403, {'error': 'Media must be submitted from the local application.'})
+        # Hai tuyến cùng nhận JSON; âm thanh là base64, không dùng bộ phân tích form cgi.
         if self.headers.get_content_type() != 'application/json':
             return self._send(415, {'error': 'Content-Type must be application/json.'})
+        if self.headers.get('Transfer-Encoding'):
+            return self._send(400, {'error': 'Use a request with Content-Length.'})
         try:
             length = int(self.headers.get('Content-Length', '0'))
         except ValueError:
             return self._send(400, {'error': 'Invalid Content-Length.'})
         # Kiểm tra độ dài trước khi đọc request để tránh nạp quá nhiều dữ liệu.
-        if not 0 < length <= MAX_BODY:
-            return self._send(413 if length > MAX_BODY else 400, {'error': 'JSON request must be between 1 byte and 64 KiB.'})
+        maximum = MAX_AUDIO_BODY if is_audio else MAX_IMAGE_BODY if is_image else MAX_BODY
+        if not 0 < length <= maximum:
+            message = ('Audio JSON must be between 1 byte and 3 MiB.' if is_audio else
+                       'Image JSON must be between 1 byte and 17 MiB.' if is_image else
+                       'JSON request must be between 1 byte and 64 KiB.')
+            return self._send(413 if length > maximum else 400, {'error': message})
         try:
+            self.connection.settimeout(90)
             raw = self.rfile.read(length)
+            if len(raw) != length:
+                return self._send(400, {'error': 'Incomplete request body.'})
             payload = json.loads(raw.decode('utf-8'))
         except (UnicodeDecodeError, json.JSONDecodeError):
             return self._send(400, {'error': 'Invalid JSON request.'})
+        except TimeoutError:
+            return self._send(408, {'error': 'Request upload timed out.'})
         # Lỗi kiểm tra đầu vào trả HTTP 400 dưới dạng JSON cho giao diện hiển thị.
         try:
+            if is_image:
+                if not self.server.image_slot.acquire(blocking=False):
+                    return self._send(429, {'error': 'Another image is being processed. Please wait.'})
+                try:
+                    result = self.server.search_service.search_uploaded_image(payload)
+                finally:
+                    self.server.image_slot.release()
+                return self._send(200, result)
+            if is_audio:
+                if not self.server.audio_slot.acquire(blocking=False):
+                    return self._send(429, {'error': 'Another voice recording is being processed. Please wait.'})
+                try:
+                    result = self.server.search_service.search_audio(payload)
+                finally:
+                    self.server.audio_slot.release()
+                return self._send(200, result)
             return self._send(200, self.server.search_service.search(payload))
+        except (TranscriptionError, ImageRecognitionError) as exc:
+            return self._send(exc.status, {'error': str(exc)})
         except (ValueError, TypeError) as exc:
             return self._send(400, {'error': str(exc)})
 
@@ -201,7 +255,7 @@ def main(argv=None):
         print(f'Unable to start web application: {exc}')
         return 1
     print(f'Web application: http://{args.host}:{args.port}/', flush=True)
-    print('Voice is simulated; image search uses artificial vectors. Press Ctrl+C to stop.', flush=True)
+    print('Voice: offline English Vosk. Image: offline CLIP (512 dimensions). No API key. Press Ctrl+C to stop.', flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

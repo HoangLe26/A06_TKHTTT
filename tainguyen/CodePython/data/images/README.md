@@ -4,7 +4,7 @@
 
 Xem [PRODUCT_SOURCES.md](../PRODUCT_SOURCES.md) để kiểm tra nguồn từng ảnh. Ảnh được lưu cục bộ để giao diện không phụ thuộc vào hotlink. Các tên/model/màu được đối chiếu với nguồn; giá và tồn kho vẫn là demo.
 
-Ảnh thật **không có nghĩa là tìm kiếm đã dùng mô hình thị giác**. Vector 3 chiều được gán thủ công, preset lấy vector từ chính bản ghi sản phẩm. Ảnh riêng tải lên chỉ dùng preview và cần nhập vector tay.
+Image Search dùng CLIP local tạo vector thật 512 chiều từ ảnh catalog và ảnh tải lên. Không còn yêu cầu nhập vector giả lập. Sau khi đổi ảnh, chạy `tainguyen/CodePython/setup_clip.py --reindex` và khởi động lại server. Xem `tainguyen/IMAGE_SEARCH_SETUP.md`.
 
 Các file SVG cũ được giữ lại cho lịch sử demo, không còn được dùng cho ảnh sản phẩm hoặc fallback của giao diện hiện tại.
 

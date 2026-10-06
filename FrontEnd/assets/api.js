@@ -9,7 +9,7 @@
       throw new Error('Open this page through the local application server to connect the catalogue.');
     }
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    const timeout = setTimeout(() => controller.abort(), options.timeoutMs || 15000);
     try {
       const response = await fetch(path, {
         ...options, signal: controller.signal,
@@ -82,7 +82,7 @@
     const fields = [['ID', product.id], ['Category', categoryLabel(product.category)], ['Color', product.color],
       ['Price (USD)', formatPrice(product.price)], ['Stock', product.stock]];
     if (typeof score === 'number' && Number.isFinite(score)) fields.push(['Ranking score', score.toFixed(4)]);
-    if (product.embedding) fields.push(['Artificial embedding', JSON.stringify(product.embedding)]);
+    if (product.embedding) fields.push(['Image embedding', `${product.embedding.length} dimensions · CLIP`]);
     for (const [label, value] of fields) {
       dialog.append(element('p', '', `${label}: ${value}`));
     }
@@ -93,7 +93,7 @@
       source.rel = 'noopener noreferrer';
       dialog.append(source);
     }
-    dialog.append(element('p', 'catalog-muted', 'Real product name and manufacturer image. Prices and stock are sample data; artificial vectors are not extracted from the photo.'), close);
+    dialog.append(element('p', 'catalog-muted', 'Real product name and manufacturer image. Prices and stock are sample data. Image search uses features extracted from product photos.'), close);
     dialog.showModal();
   }
 
@@ -146,6 +146,9 @@
   window.Catalog = {
     request,
     search: payload => request('/api/search', { method: 'POST', body: payload }),
+    searchAudio: payload => request('/api/voice-search', { method: 'POST', body: payload, timeoutMs: 75000 }),
+    searchImage: payload => request('/api/image-search', { method: 'POST', body: payload, timeoutMs: 90000 }),
+    getHealth: () => request('/api/health'),
     getCatalog: () => request('/api/catalog'),
     getOrder: id => request('/api/orders/' + encodeURIComponent(id)),
     getOrders: () => request('/api/orders'),

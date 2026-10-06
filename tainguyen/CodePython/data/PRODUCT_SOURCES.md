@@ -1,6 +1,6 @@
 # Nguồn tên và ảnh sản phẩm
 
-Catalog có đúng 20 sản phẩm, mỗi nhóm 5 sản phẩm. Tên/model và ảnh lấy từ nguồn chính hãng Apple, ASUS và Logitech; không có ảnh sinh bởi AI. Giá USD, tồn kho, đơn mẫu và vector 3 chiều là dữ liệu mô phỏng, không phải thông tin bán hàng hiện hành.
+Catalog có đúng 20 sản phẩm, mỗi nhóm 5 sản phẩm. Tên/model và ảnh lấy từ nguồn chính hãng Apple, ASUS và Logitech; không có ảnh sinh bởi AI. Giá USD, tồn kho và đơn mẫu là dữ liệu mô phỏng, không phải thông tin bán hàng hiện hành. Vector ảnh thật 512 chiều được CLIP local tạo và lưu tại `CodePython/data/clip_embeddings.json`.
 
 Ngày đối chiếu nguồn: 05/10/2026. Ảnh chạy ứng dụng vẫn lưu trong `CodePython/data/images/catalog/` ở gốc dự án; tài liệu này đã chuyển vào `tainguyen`. Bấm **View Details → Official product source** trên giao diện để mở nguồn sản phẩm.
 
@@ -48,6 +48,6 @@ Ngày đối chiếu nguồn: 05/10/2026. Ảnh chạy ứng dụng vẫn lưu t
 
 Ảnh iPad A16, iPad Air, iPad Pro và MacBook Air hiện là ảnh lineup chính hãng (nhiều màu/cỡ), không phải ảnh riêng cho màu của bản ghi. iPad mini dùng ảnh riêng màu Starlight. Hai iPad Air M3 sử dụng cùng ảnh lineup do trang thông số 11-inch và 13-inch của Apple dùng chung ảnh; tên và trang thông số của hai mẫu vẫn riêng biệt.
 
-Ảnh thật không đồng nghĩa với embedding thật: tìm kiếm ảnh hiện vẫn nhận vector gán thủ công; ảnh tải lên chỉ dùng preview cục bộ. Ảnh, nhãn hiệu và thiết kế thuộc nhà sản xuất. Ghi nguồn không cấp phép sử dụng thương mại; cần kiểm tra quyền sử dụng trước khi công khai hoặc kinh doanh.
+Tìm kiếm ảnh hiện dùng CLIP local để trích xuất embedding thật cho cả ảnh catalog và ảnh tải lên. Nhãn và độ tương đồng không xác nhận chắc chắn đúng model/kích thước, nhất là ảnh lineup hoặc ảnh trùng giữa sản phẩm. Ảnh, nhãn hiệu và thiết kế thuộc nhà sản xuất. Ghi nguồn không cấp phép sử dụng thương mại; cần kiểm tra quyền sử dụng trước khi công khai hoặc kinh doanh.
 
 Đổi sản phẩm tại `CodePython/data/products.json`, giữ ID duy nhất và cập nhật ảnh, nguồn, `search_terms`. Có thể tải lại ảnh đã khai báo bằng `python tainguyen/CodePython/data/download_product_images.py` từ folder gốc (cần internet và curl). Dừng rồi chạy lại server sau khi thay JSON.

@@ -60,12 +60,13 @@ class SearchUI:
             return []
 
     def search_image(self, embedding, top_k=None):
-        """Tìm bằng vector nhân tạo và hiển thị điểm với nhãn similarity."""
+        """Tìm bằng vector CLIP và hiển thị điểm với nhãn similarity."""
         print("\n=== IMAGE SEARCH ===")
-        print("Processing mode: Image (artificial embedding; cosine similarity)")
-        print("Query embedding:", embedding)
+        print("Processing mode: Image (CLIP embedding; cosine similarity)")
         try:
             query = self.query_service.image_query(embedding)
+            vector = query['embedding']
+            print("Query embedding:", len(vector), "dimensions; first 8 components:", vector[:8])
             return self._retrieve_rank_display(query, top_k=top_k, score_label="similarity")
         except (ValueError, TypeError) as exc:
             print(f"Validation error: {exc}")

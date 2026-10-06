@@ -1,4 +1,4 @@
-"""Tính độ tương đồng cosine giữa các vector ảnh nhân tạo đã được kiểm tra."""
+"""Tính độ tương đồng cosine giữa các vector ảnh CLIP đã được kiểm tra."""
 
 import numpy as np
 
@@ -15,7 +15,7 @@ def normalize_embedding(embedding):
 
 
 class ImageService:
-    """So sánh vector số; không đọc pixel hoặc trích xuất đặc trưng từ ảnh thật."""
+    """So sánh vector; ImageEmbeddingService phụ trách trích xuất đặc trưng ảnh."""
 
     def cosine_similarity(self, a, b):
         """Tính cosine trong khoảng [-1, 1]; vector toàn số 0 trả điểm 0."""

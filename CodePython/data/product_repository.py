@@ -5,6 +5,8 @@ import json
 import math
 from pathlib import Path
 
+from .image_vector_repository import load_image_vectors, DIMENSION, MODEL_ID
+
 
 class ProductRepository:
     """Nạp sản phẩm một lần vào bộ nhớ và cung cấp thao tác tra cứu theo ID."""
@@ -35,6 +37,20 @@ class ProductRepository:
             if product_id in seen:
                 raise ValueError(f"Duplicate product id: {product_id}")
             seen.add(product_id)
+        self.image_index_error = None
+        # Catalog mặc định dùng vector thật từ cache riêng, không còn vector giả lập.
+        # File dữ liệu tùy chọn vẫn được giữ nguyên để test thuật toán độc lập.
+        if data_path is None:
+            try:
+                vectors = load_image_vectors(products)
+                for product in products:
+                    product.update(embedding=vectors[product['id']], embedding_is_artificial=False,
+                                   embedding_dimension=DIMENSION, embedding_model=MODEL_ID)
+            except ValueError as exc:
+                self.image_index_error = str(exc)
+                for product in products:
+                    product.pop('embedding', None)
+                    product.pop('embedding_is_artificial', None)
         self._products = products
         # Dictionary giúp tra theo ID mà không phải duyệt toàn bộ danh sách.
         self._by_id = {product["id"]: product for product in products}

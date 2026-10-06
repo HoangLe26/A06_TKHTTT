@@ -36,7 +36,7 @@ class WebIntegrationTests(unittest.TestCase):
         cls.thread.join(timeout=5)
 
     def request(self, method, path, body=None, content_type='application/json'):
-        connection = http.client.HTTPConnection('127.0.0.1', self.server.server_port, timeout=5)
+        connection = http.client.HTTPConnection('127.0.0.1', self.server.server_port, timeout=30)
         headers = {}
         if body is not None:
             headers['Content-Type'] = content_type
@@ -74,7 +74,8 @@ class WebIntegrationTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(health['product_count'], 20)
         self.assertEqual(health['order_count'], 3)
-        self.assertEqual(health['vector_dimension'], 3)
+        self.assertEqual(health['vector_dimension'], 512)
+        self.assertTrue(health['image_api']['configured'])
         _, catalog, _ = self.request('GET', '/api/catalog')
         self.assertEqual(set(catalog['categories']), {'phone', 'tablet', 'laptop', 'accessory'})
         self.assertEqual(catalog['category_labels'],
@@ -133,7 +134,7 @@ class WebIntegrationTests(unittest.TestCase):
     def test_empty_queries_and_zero_vector(self):
         for query in ['', 'zzznomatchingproductzzz']:
             self.assertEqual(self.search({'type': 'text', 'query': query})['results'], [])
-        result = self.search({'type': 'image', 'embedding': [0, 0, 0]})
+        result = self.search({'type': 'image', 'embedding': [0] * 512})
         self.assertEqual(len(result['results']), 20)
         self.assertTrue(all(item['score'] == 0.0 for item in result['results']))
 
@@ -222,9 +223,9 @@ class WebIntegrationTests(unittest.TestCase):
 
     def test_out_of_stock_products_are_filtered(self):
         for category, excluded_id in [('laptop', 15), ('accessory', 20)]:
-            unfiltered = self.search({'type': 'image', 'embedding': [0, 0, 0],
+            unfiltered = self.search({'type': 'image', 'embedding': [0] * 512,
                                       'filters': {'category': category}})
-            filtered = self.search({'type': 'image', 'embedding': [0, 0, 0],
+            filtered = self.search({'type': 'image', 'embedding': [0] * 512,
                                     'filters': {'category': category, 'in_stock': True}})
             self.assertEqual(unfiltered['returned_count'], 5)
             self.assertEqual(filtered['returned_count'], 4)

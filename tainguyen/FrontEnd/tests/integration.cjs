@@ -1,7 +1,7 @@
 /* DOM + real API integration checks. This does not measure browser layout. */
 const assert = require('node:assert/strict');
 const { JSDOM, ResourceLoader, VirtualConsole } = require('jsdom');
-const base = process.env.SEARCH_BASE_URL || 'http://127.0.0.1:8000';
+const base = process.env.SEARCH_BASE_URL || process.argv[2] || 'http://127.0.0.1:8000';
 const baseOrigin = new URL(base).origin;
 let checks = 0;
 let catalog, orders;
@@ -17,7 +17,7 @@ class LocalResources extends ResourceLoader {
 }
 
 async function waitFor(predicate, label) {
-  const deadline = Date.now() + 5000;
+  const deadline = Date.now() + 30000;
   while (Date.now() < deadline) {
     if (predicate()) return;
     await new Promise(resolve => setTimeout(resolve, 25));
@@ -99,9 +99,9 @@ function checkRemovedIntro(p, mode) {
       assert.match(p.document.body.textContent, /One Point per Matching Keyword/);
     } else if (mode === 'Voice') {
       assert.ok(p.document.getElementById('voice-banner-latency'));
-      assert.match(p.document.body.textContent, /Transcript Simulation · No Microphone/);
+      assert.match(p.document.body.textContent, /English Voice Search · Record & Transcribe/);
     } else if (mode === 'Image') {
-      assert.match(p.document.body.textContent, /Artificial vectors · NumPy cosine similarity · 3 dimensions/);
+      assert.match(p.document.body.textContent, /Local CLIP · Real image features · 512 dimensions/);
     }
   });
 }
@@ -217,11 +217,18 @@ async function testText() {
 async function testVoice() {
   const p = await page('/voice-search');
   try {
-    await waitFor(() => cards(p, 'voice-results').length > 0, 'voice default');
+    await waitFor(() => text(p, 'voice-api-status') !== 'Checking local voice model...', 'voice health check');
+    check('Voice starts empty and does not auto-submit paid audio requests', () => {
+      assert.equal(p.document.getElementById('voice-input').value, '');
+      assert.equal(cards(p, 'voice-results').length, 0);
+      assert.ok(!p.requests.some(request => request.path === '/api/voice-search'));
+    });
     checkEnglishUI(p, 'Voice');
     checkRemovedIntro(p, 'Voice');
     checkCleanProductLabels(p, 'Voice', 'voice-results');
-    check('Voice displays the identity transcription returned by Python', () => assert.equal(text(p, 'voice-transcribed'), 'find laptop'));
+    p.document.getElementById('voice-preset-btn').click();
+    await waitFor(() => cards(p, 'voice-results').length === 5, 'typed voice preset');
+    check('Voice typed fallback displays the transcript returned by Python', () => assert.equal(text(p, 'voice-transcribed'), 'find laptop'));
     edit(p, 'voice-input', 'find tablet');
     p.document.getElementById('voice-input').dispatchEvent(new p.window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
     await waitFor(() => text(p, 'voice-transcribed') === 'find tablet', 'voice edit');
@@ -243,51 +250,89 @@ async function testVoice() {
 async function testImage() {
   const p = await page('/image-search');
   try {
-    await waitFor(() => cards(p, 'image-results').length === 20, 'image default');
+    await waitFor(() => text(p, 'image-model-status').includes('CLIP ready'), 'image model ready');
     checkEnglishUI(p, 'Image');
     checkRemovedIntro(p, 'Image');
-    checkCleanProductLabels(p, 'Image', 'image-results');
-    check('Image preset uses the actual artificial-vector index', () => assert.ok(cards(p, 'image-results')[0].textContent.includes(product(1).name)));
-    p.document.getElementById('btn-sample-2').click();
-    await waitFor(() => cards(p, 'image-results')[0]?.textContent.includes(product(6).name), 'tablet preset');
-    check('Tablet preset uses its real manufacturer image', () => assert.equal(p.document.getElementById('query-preview-img').getAttribute('src'), product(6).image_url));
-    for (const [buttonId, productId] of [['btn-sample-3', 11], ['btn-sample-4', 16]]) {
-      p.document.getElementById(buttonId).click();
-      await waitFor(() => cards(p, 'image-results')[0]?.textContent.includes(product(productId).name), 'other category preset');
-      check(`Image preset ${productId} is connected to the catalogue`, () => assert.equal(p.document.getElementById('query-preview-img').getAttribute('src'), product(productId).image_url));
-    }
-    edit(p, 'image-embedding', '1, 2');
-    submit(p, 'image-search-form');
-    check('Invalid dimension is shown without old image results', () => {
-      assert.match(text(p, 'image-status'), /exactly 3/);
+    check('Image does not auto-run inference or require a manual vector', () => {
       assert.equal(cards(p, 'image-results').length, 0);
+      assert.equal(p.document.getElementById('image-embedding'), null);
+      assert.ok(!p.requests.some(r => r.path === '/api/image-search'));
     });
-    edit(p, 'image-embedding', '0, 0, 0');
     submit(p, 'image-search-form');
-    await waitFor(() => cards(p, 'image-results').length === 20, 'zero image');
-    check('Zero-vector image search returns finite zero scores', () => assert.match(cards(p, 'image-results')[0].textContent, /0\.0000/));
-    edit(p, 'image-threshold', '0.99', 'change');
+    await waitFor(() => cards(p, 'image-results').length === 20, 'image reference results');
+    checkCleanProductLabels(p, 'Image', 'image-results');
+    check('Image reference is encoded by CLIP on the backend', () => {
+      assert.ok(cards(p, 'image-results')[0].textContent.includes(product(1).name));
+      assert.match(text(p, 'image-detected-object'), /phone/);
+      assert.equal(JSON.parse(p.document.getElementById('image-vector-preview').value).length, 512);
+      assert.equal(p.document.getElementById('image-vector-download').disabled, false);
+      const request = JSON.parse(p.requests.filter(r => r.path === '/api/image-search').at(-1).options.body);
+      assert.equal(request.product_id, 1);
+      assert.equal(request.embedding, undefined);
+    });
+    for (const [buttonId, productId, label] of [
+      ['btn-sample-2', 6, 'tablet'], ['btn-sample-3', 11, 'laptop'], ['btn-sample-4', 16, 'mouse']]) {
+      p.document.getElementById(buttonId).click();
+      await waitFor(() => !p.document.getElementById('btn-search-trigger').disabled
+        && cards(p, 'image-results')[0]?.textContent.includes(product(productId).name), 'reference ' + productId);
+      check('Real reference image is recognized: ' + label, () => {
+        assert.equal(p.document.getElementById('query-preview-img').getAttribute('src'), product(productId).image_url);
+        assert.match(text(p, 'image-detected-object'), new RegExp(label));
+      });
+    }
+    edit(p, 'image-top-k', '3', 'change');
     submit(p, 'image-search-form');
-    await waitFor(() => text(p, 'image-status').includes('No products match'), 'threshold');
-    check('Similarity threshold is a real backend filter', () => assert.equal(cards(p, 'image-results').length, 0));
+    await waitFor(() => cards(p, 'image-results').length === 3, 'image top k');
+    check('Image top-k is applied after ranking', () => assert.match(text(p, 'image-result-count'), /3 ranked/));
+    edit(p, 'image-category', 'laptop', 'change');
+    edit(p, 'image-threshold', '0.9999', 'change');
+    submit(p, 'image-search-form');
+    await waitFor(() => text(p, 'image-status').includes('No products match'), 'image threshold');
+    check('Image category and threshold filter the real cosine results', () => assert.equal(cards(p, 'image-results').length, 0));
     edit(p, 'image-threshold', '', 'change');
-    const file = new p.window.File([Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aN0sAAAAASUVORK5CYII=', 'base64')], 'sample.png', { type: 'image/png' });
+    edit(p, 'image-category', '', 'change');
+    const bytes = require('node:fs').readFileSync(require('node:path').join(__dirname,
+      '../../../CodePython/data/images', product(16).image));
+    const file = new p.window.File([bytes], 'mouse.png', { type: 'image/png' });
     Object.defineProperty(p.document.getElementById('file-input'), 'files', { configurable: true, value: [file] });
     p.document.getElementById('file-input').dispatchEvent(new p.window.Event('change'));
-    check('Custom image is preview-only and cannot reuse the old preset vector', () => {
-      assert.equal(p.document.getElementById('image-embedding').value, '');
-      assert.match(text(p, 'image-status'), /No feature extraction or upload/);
+    check('Custom image replaces the reference and clears old vectors', () => {
+      assert.equal(p.document.getElementById('image-vector-preview').value, '');
       assert.equal(cards(p, 'image-results').length, 0);
+      assert.match(text(p, 'image-status'), /local Python server/);
     });
     submit(p, 'image-search-form');
-    check('Custom image requires a manually supplied vector', () => assert.match(text(p, 'image-status'), /Enter the artificial vector/));
-    edit(p, 'image-embedding', JSON.stringify(product(6).embedding));
-    submit(p, 'image-search-form');
-    await waitFor(() => cards(p, 'image-results')[0]?.textContent.includes(product(6).name), 'manual custom vector');
-    check('Manual vector searches through the same cosine API', () => assert.match(cards(p, 'image-results')[0].textContent, /1\.0000/));
-    Object.defineProperty(p.document.getElementById('file-input'), 'files', { configurable: true, value: [{ name: 'large.png', type: 'image/png', size: 13 * 1024 * 1024 }] });
+    await waitFor(() => cards(p, 'image-results')[0]?.textContent.includes(product(16).name), 'real file upload');
+    check('File upload creates a real vector without manual input', () => {
+      assert.match(text(p, 'image-detected-object'), /mouse/);
+      assert.equal(JSON.parse(p.document.getElementById('image-vector-preview').value).length, 512);
+      const request = JSON.parse(p.requests.filter(r => r.path === '/api/image-search').at(-1).options.body);
+      assert.equal(request.product_id, undefined);
+      assert.equal(Buffer.from(request.image_base64, 'base64').compare(bytes), 0);
+    });
+    const bad = new p.window.File(['broken image'], 'bad.png', { type: 'image/png' });
+    Object.defineProperty(p.document.getElementById('file-input'), 'files', { configurable: true, value: [bad] });
     p.document.getElementById('file-input').dispatchEvent(new p.window.Event('change'));
-    check('Image preview rejects files over the stated limit', () => assert.match(text(p, 'image-status'), /12 MB/));
+    submit(p, 'image-search-form');
+    await waitFor(() => text(p, 'image-status').includes('corrupt'), 'bad image server validation');
+    check('Corrupt image is rejected without showing fake results', () => {
+      assert.equal(cards(p, 'image-results').length, 0);
+      assert.equal(p.document.getElementById('image-vector-preview').value, '');
+      assert.equal(p.document.getElementById('image-vector-download').disabled, true);
+    });
+    Object.defineProperty(p.document.getElementById('file-input'), 'files', {
+      configurable: true, value: [{ name: 'large.png', type: 'image/png', size: 13 * 1024 * 1024 }] });
+    p.document.getElementById('file-input').dispatchEvent(new p.window.Event('change'));
+    check('Oversized image cannot leave the old reference active', () => {
+      assert.match(text(p, 'image-status'), /12 MB/);
+      assert.equal(p.document.getElementById('btn-search-trigger').disabled, true);
+    });
+    p.document.getElementById('image-clear').click();
+    check('Clear removes image, vector and results', () => {
+      assert.equal(p.document.getElementById('query-preview-img').getAttribute('src'), null);
+      assert.equal(p.document.getElementById('image-vector-preview').value, '');
+      assert.equal(cards(p, 'image-results').length, 0);
+    });
     assert.deepEqual(p.errors, []);
   } finally { p.window.close(); }
 }

@@ -20,8 +20,8 @@ Không cần Node/npm để chạy ứng dụng. Không mở `code.html` bằng 
 | Trang | URL | Chức năng đã nối |
 | --- | --- | --- |
 | Text Search | `/text-search` | Search/Enter, Clear, preset, danh mục, top-k, chi tiết sản phẩm |
-| Voice Search | `/voice-search` | Văn bản phiên âm chỉnh được, mô phỏng SpeechService, bộ lọc, top-k, xem dạng lưới/danh sách |
-| Image Search | `/image-search` | 4 preset điện thoại/máy tính bảng/laptop/phụ kiện, vector nhập tay, cosine, ngưỡng similarity, bộ lọc, preview ảnh cục bộ |
+| Voice Search | `/voice-search` | Record / Stop & Search, Vosk tiếng Anh offline, transcript chỉnh được, bộ lọc, top-k, lưới/danh sách |
+| Image Search | `/image-search` | Upload JPEG/PNG, CLIP local tạo vector thật 512 chiều, nhãn vật thể dự đoán, cosine, bộ lọc và xuất vector JSON |
 | Order Search | `/order-search` | Tra ID, preset, tra gần đây trong phiên, chi tiết/tổng tiền/tracking mẫu, in hoặc lưu PDF bằng trình duyệt |
 
 ## Những điểm đã điều chỉnh để tương thích
@@ -30,15 +30,15 @@ Không cần Node/npm để chạy ứng dụng. Không mở `code.html` bằng 
 - **Filter Facets:** bấm danh mục sẽ xóa từ khóa cũ và giới hạn top-k để duyệt sản phẩm của nhóm; All Categories hiển thị toàn catalog. Nút In Stock Only và biểu tượng check_circle đã được bỏ khỏi Text Search; trang này không lọc tồn kho. Nhập từ khóa rồi Search/Enter để tìm trong nhóm đang chọn; tìm kiếm với ô trống sẽ duyệt nhóm.
 - Kết quả sản phẩm mẫu cố định trong HTML được thay bằng 20 sản phẩm có tên thật trong `CodePython/data/products.json`; tên, giá và điểm của các sản phẩm trang mẫu cũ không còn được dùng làm kết quả.
 - Nhãn BM25/inverted index được đổi thành keyword matching đúng thuật toán hiện tại.
-- Trang voice bỏ nhãn Whisper, dữ liệu âm thanh PCM và confidence giả. Đầu vào là văn bản đã phiên âm; waveform chỉ minh họa.
-- Trang image bỏ nhãn ViT/TensorRT, vector 512 chiều và ROI giả. Vector hiện có 3 chiều, được gán thủ công; similarity không phải xác suất nhận dạng đúng.
+- Trang voice ghi âm thật bằng MediaRecorder, gửi sau khi dừng và phiên âm bằng Vosk tiếng Anh local. Không cần API key; xem [hướng dẫn cài model](../VOICE_API_SETUP.md). FFmpeg đi kèm thư viện chuyển bản ghi sang PCM 16 kHz. Ô transcript vẫn có thể nhập/sửa tay; waveform chỉ minh họa, không phải đồ thị audio đo được.
+- Trang image dùng CLIP ViT-B/32 local trên CPU, vector thật 512 chiều và cosine similarity. Ảnh tải lên gửi tới Python local, không gọi cloud. Xem [hướng dẫn Image Search](../IMAGE_SEARCH_SETUP.md).
 - Bổ sung `orders.json` với ba đơn mẫu và `OrderService` để trang Order Search lấy dữ liệu thực. `OrderRepository` giữ giao diện dùng trong bộ nhớ cũ và thêm cách tải JSON.
 - Hình sản phẩm là 20 ảnh chính hãng lưu cục bộ trong `CodePython/data/images/catalog/`, không sinh bằng AI. Mỗi sản phẩm có link nguồn chính hãng trong View Details; danh sách nguồn nằm ở `tainguyen/CodePython/data/PRODUCT_SOURCES.md`. Mức giá USD dùng để trình diễn, không phải bảng giá bán thật.
 
 ## Các phần còn giới hạn
 
-1. **Voice chưa nhận microphone hay file audio.** Muốn nói trực tiếp cần triển khai nhận dạng giọng nói thật.
-2. **Image chưa trích xuất embedding từ ảnh tải lên.** Chọn/kéo thả JPEG/PNG chỉ tạo preview trong trình duyệt, không gửi ảnh lên server. Khi chọn ảnh riêng, vector cũ bị xóa; phải nhập vector thủ công trước khi tìm kiếm. Giới hạn preview 12 MB.
+1. **Voice cần thư viện Vosk và model tiếng Anh được cài trên máy.** Chỉ cần Internet khi cài lần đầu; phiên âm offline không có phí dịch vụ. Ghi âm tối đa 30 giây/2 MiB; chưa streaming hay có nút upload file audio riêng. Model nhỏ có thể nhận sai tên sản phẩm/phát âm khó, nên cho phép sửa transcript.
+2. **Image cần model CLIP và cache vector sản phẩm.** JPEG/PNG tối đa 12 MiB/20 megapixel; CPU và lần tìm đầu cần nạp model. Không nhận diện chắc chắn đúng hãng/phiên bản. Ảnh nhiều vật thể/lineup có thể gây nhầm nhãn; score cosine không phải xác suất.
 3. **Order là dữ liệu demo, chỉ đọc.** Customer History, Return Log, Saved Invoices, Contact Support, Reorder và Update Status chưa có backend nên được vô hiệu hóa kèm giải thích. Tracking là sự kiện ghi trong JSON, không kết nối hãng vận chuyển. Dữ liệu khách hàng/địa chỉ đều là ví dụ giả lập.
 4. **Chưa có đăng nhập, giỏ hàng, thanh toán hoặc quản lý profile.** Đây là giao diện tìm kiếm local.
 5. **Tìm kiếm text chưa hiểu điều kiện ngôn ngữ tự nhiên** như `under 100 dollars`. API có filter `max_price` rõ ràng cho mở rộng; chưa có ô lọc giá trên giao diện. Keyword/voice nhận tên thật cùng từ khóa danh mục tiếng Anh hoặc tiếng Việt có dấu/không dấu, `chuột` và `bàn phím`; chưa hiểu ngữ nghĩa.
@@ -71,4 +71,4 @@ Các file `assets/api.js` và `assets/{text,voice,image,orders}.js` gọi API, h
 
 ## Bộ sản phẩm mới
 
-Mỗi nhóm `phone`, `tablet`, `laptop`, `accessory` có đúng 5 sản phẩm. Phụ kiện gồm 3 chuột và 2 bàn phím. Giá, tồn kho, đơn hàng và vector vẫn là demo. Hai sản phẩm có tồn kho 0 để thử bộ lọc In Stock Only. Sau khi thay JSON phải khởi động lại server và tải lại trang.
+Mỗi nhóm `phone`, `tablet`, `laptop`, `accessory` có đúng 5 sản phẩm. Phụ kiện gồm 3 chuột và 2 bàn phím. Giá, tồn kho và đơn hàng là dữ liệu mẫu; vector ảnh được CLIP trích xuất thật. Hai sản phẩm có tồn kho 0 để thử bộ lọc In Stock Only. Sau khi thay ảnh hoặc thêm/xóa sản phẩm, chạy `python tainguyen/CodePython/setup_clip.py --reindex`, rồi khởi động lại server và tải lại trang.

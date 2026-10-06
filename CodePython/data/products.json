@@ -6,11 +6,6 @@
     "color": "ultramarine",
     "price": 799,
     "stock": 12,
-    "embedding": [
-      0.95,
-      0.1,
-      0.05
-    ],
     "image": "catalog/apple-iphone-16-ultramarine.jpg",
     "source_url": "https://support.apple.com/en-us/121029",
     "image_source_url": "https://www.apple.com/v/iphone/compare/am/images/overview/compare_iphone16_ultramarine__sr260qois4am_large_2x.jpg",
@@ -21,8 +16,7 @@
       "dien thoai",
       "smartphone"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 2,
@@ -31,11 +25,6 @@
     "color": "teal",
     "price": 899,
     "stock": 9,
-    "embedding": [
-      0.91,
-      0.13,
-      0.06
-    ],
     "image": "catalog/apple-iphone-16-plus-teal.jpg",
     "source_url": "https://support.apple.com/en-us/121030",
     "image_source_url": "https://www.apple.com/v/iphone/compare/am/images/overview/compare_iphone16_plus_teal__fd5m157o5h6y_large_2x.jpg",
@@ -46,8 +35,7 @@
       "dien thoai",
       "smartphone"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 3,
@@ -56,11 +44,6 @@
     "color": "desert titanium",
     "price": 999,
     "stock": 7,
-    "embedding": [
-      0.97,
-      0.09,
-      0.08
-    ],
     "image": "catalog/apple-iphone-16-pro-desert-titanium.jpg",
     "source_url": "https://support.apple.com/en-us/121031",
     "image_source_url": "https://www.apple.com/v/iphone/compare/am/images/overview/compare_iphone16_pro_desert_titanium__ftixjyyve6qi_large_2x.jpg",
@@ -71,8 +54,7 @@
       "dien thoai",
       "smartphone"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 4,
@@ -81,11 +63,6 @@
     "color": "natural titanium",
     "price": 1199,
     "stock": 6,
-    "embedding": [
-      0.93,
-      0.11,
-      0.09
-    ],
     "image": "catalog/apple-iphone-16-pro-max-natural-titanium.jpg",
     "source_url": "https://support.apple.com/en-us/121032",
     "image_source_url": "https://www.apple.com/v/iphone/compare/am/images/overview/compare_iphone16_pro_max_natural_titanium__finz5cbww0mm_large_2x.jpg",
@@ -96,8 +73,7 @@
       "dien thoai",
       "smartphone"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 5,
@@ -106,11 +82,6 @@
     "color": "white",
     "price": 599,
     "stock": 14,
-    "embedding": [
-      0.9,
-      0.08,
-      0.12
-    ],
     "image": "catalog/apple-iphone-16e-white.jpg",
     "source_url": "https://support.apple.com/en-us/122208",
     "image_source_url": "https://www.apple.com/v/iphone/compare/am/images/overview/compare_iphone16e_white__qfwztyphaj2u_large_2x.jpg",
@@ -121,8 +92,7 @@
       "dien thoai",
       "smartphone"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 6,
@@ -131,11 +101,6 @@
     "color": "blue",
     "price": 349,
     "stock": 10,
-    "embedding": [
-      0.65,
-      0.7,
-      0.1
-    ],
     "image": "catalog/apple-ipad-a16-lineup.png",
     "source_url": "https://support.apple.com/en-us/122240",
     "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/122240-ipad-a16.png",
@@ -147,7 +112,6 @@
       "tablet"
     ],
     "stock_is_demo": true,
-    "embedding_is_artificial": true,
     "image_note": "Official manufacturer color/size lineup; the catalog entry selects one variant."
   },
   {
@@ -157,11 +121,6 @@
     "color": "starlight",
     "price": 499,
     "stock": 8,
-    "embedding": [
-      0.63,
-      0.73,
-      0.11
-    ],
     "image": "catalog/apple-ipad-mini-a17-pro-lineup.png",
     "source_url": "https://support.apple.com/en-us/121456",
     "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/iPad_mini_A17_Pro_Wi-Fi_Lineup_Print__USEN.png",
@@ -172,8 +131,7 @@
       "may tinh bang",
       "tablet"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 8,
@@ -182,11 +140,6 @@
     "color": "blue",
     "price": 599,
     "stock": 11,
-    "embedding": [
-      0.67,
-      0.71,
-      0.09
-    ],
     "image": "catalog/apple-ipad-air-11-inch-m3-lineup.png",
     "source_url": "https://support.apple.com/en-us/122241",
     "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/122241-122242-ipad-air-11inch-13inch-m3.png",
@@ -198,7 +151,6 @@
       "tablet"
     ],
     "stock_is_demo": true,
-    "embedding_is_artificial": true,
     "image_note": "Official manufacturer color/size lineup; the catalog entry selects one variant."
   },
   {
@@ -208,11 +160,6 @@
     "color": "starlight",
     "price": 799,
     "stock": 5,
-    "embedding": [
-      0.61,
-      0.76,
-      0.12
-    ],
     "image": "catalog/apple-ipad-air-13-inch-m3-lineup.png",
     "source_url": "https://support.apple.com/en-us/122242",
     "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/122241-122242-ipad-air-11inch-13inch-m3.png",
@@ -224,7 +171,6 @@
       "tablet"
     ],
     "stock_is_demo": true,
-    "embedding_is_artificial": true,
     "image_note": "Official manufacturer color/size lineup; the catalog entry selects one variant."
   },
   {
@@ -234,11 +180,6 @@
     "color": "space black",
     "price": 999,
     "stock": 4,
-    "embedding": [
-      0.64,
-      0.74,
-      0.14
-    ],
     "image": "catalog/apple-ipad-pro-11-inch-m4-lineup.png",
     "source_url": "https://support.apple.com/en-us/119892",
     "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/tech-specs/ipad-pro-11-inch-13-inch.png",
@@ -250,7 +191,6 @@
       "tablet"
     ],
     "stock_is_demo": true,
-    "embedding_is_artificial": true,
     "image_note": "Official manufacturer color/size lineup; the catalog entry selects one variant."
   },
   {
@@ -260,11 +200,6 @@
     "color": "sky blue",
     "price": 1049,
     "stock": 8,
-    "embedding": [
-      0.1,
-      0.95,
-      0.1
-    ],
     "image": "catalog/apple-macbook-air-13-m4-lineup.png",
     "source_url": "https://support.apple.com/en-us/122209",
     "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-air/2025-macbook-air-13in-colors.png",
@@ -276,7 +211,6 @@
       "computer"
     ],
     "stock_is_demo": true,
-    "embedding_is_artificial": true,
     "image_note": "Official 13-inch M4 model color lineup; catalog record selects sky blue."
   },
   {
@@ -286,11 +220,6 @@
     "color": "midnight",
     "price": 1249,
     "stock": 5,
-    "embedding": [
-      0.12,
-      0.94,
-      0.08
-    ],
     "image": "catalog/apple-macbook-air-15-m4-lineup.png",
     "source_url": "https://support.apple.com/en-us/122210",
     "image_source_url": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-air/2025-macbook-air-15in-colors.png",
@@ -302,7 +231,6 @@
       "computer"
     ],
     "stock_is_demo": true,
-    "embedding_is_artificial": true,
     "image_note": "Official 15-inch M4 model color lineup; catalog record selects midnight."
   },
   {
@@ -312,11 +240,6 @@
     "color": "space black",
     "price": 1649,
     "stock": 6,
-    "embedding": [
-      0.08,
-      0.96,
-      0.12
-    ],
     "image": "catalog/apple-macbook-pro-14-m4-space-black.jpg",
     "source_url": "https://support.apple.com/en-us/121552",
     "image_source_url": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spaceblack-select-202410?wid=1200&hei=1200&fmt=jpeg&qlt=90",
@@ -327,8 +250,7 @@
       "notebook",
       "computer"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 14,
@@ -337,11 +259,6 @@
     "color": "silver",
     "price": 2549,
     "stock": 3,
-    "embedding": [
-      0.14,
-      0.93,
-      0.1
-    ],
     "image": "catalog/apple-macbook-pro-16-m4-pro-silver.jpg",
     "source_url": "https://support.apple.com/en-us/121554",
     "image_source_url": "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp16-silver-select-202410?wid=1200&hei=1200&fmt=jpeg&qlt=90",
@@ -352,8 +269,7 @@
       "notebook",
       "computer"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 15,
@@ -362,11 +278,6 @@
     "color": "ponder blue",
     "price": 1199,
     "stock": 0,
-    "embedding": [
-      0.06,
-      0.95,
-      0.14
-    ],
     "image": "catalog/asus-zenbook-14-oled-ux3405-ponder-blue.png",
     "source_url": "https://www.asus.com/laptops/for-home/zenbook/asus-zenbook-14-oled-ux3405/",
     "image_source_url": "https://dlcdnwebimgs.asus.com/gain/caf912a5-5bc2-4a81-ac8f-6339e488f549/w800",
@@ -377,8 +288,7 @@
       "notebook",
       "computer"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 16,
@@ -387,11 +297,6 @@
     "color": "black",
     "price": 95,
     "stock": 11,
-    "embedding": [
-      0.1,
-      0.2,
-      0.95
-    ],
     "image": "catalog/logitech-mx-master-3s-bluetooth-black.png",
     "source_url": "https://www.logitech.com/en-us/shop/p/mx-master-3s",
     "image_source_url": "https://resource.logitech.com/content/dam/logitech/en/products/mice/mx-master-3s/2025-update/mx-master-3s-bluetooth-edition-top-view-black-new-1.png",
@@ -405,8 +310,7 @@
       "chuot",
       "mouse"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 17,
@@ -415,11 +319,6 @@
     "color": "black",
     "price": 55,
     "stock": 18,
-    "embedding": [
-      0.14,
-      0.18,
-      0.94
-    ],
     "image": "catalog/logitech-g502-hero-black.png",
     "source_url": "https://www.logitechg.com/en-us/shop/p/g502-hero-gaming-mouse",
     "image_source_url": "https://resource.logitechg.com/content/dam/gaming/en/non-braid/hyjal-g502-hero/2025/g502-hero-mouse-top-angle-gallery-1.png",
@@ -433,8 +332,7 @@
       "chuot",
       "mouse"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 18,
@@ -443,11 +341,6 @@
     "color": "tonal rose",
     "price": 29,
     "stock": 15,
-    "embedding": [
-      0.07,
-      0.22,
-      0.96
-    ],
     "image": "catalog/logitech-pebble-mouse-2-m350s-tonal-rose.png",
     "source_url": "https://www.logitech.com/en-us/shop/p/pebble-2-m350s-wireless-mouse",
     "image_source_url": "https://resource.logitech.com/content/dam/logitech/en/products/mice/pebble-mouse-2-m350s/2026-refresh/gallery/pebble-mouse-2-m350s-tonal-rose-top-angle-gallery-1.png",
@@ -461,8 +354,7 @@
       "chuot",
       "mouse"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 19,
@@ -471,11 +363,6 @@
     "color": "graphite",
     "price": 115,
     "stock": 7,
-    "embedding": [
-      0.12,
-      0.25,
-      0.93
-    ],
     "image": "catalog/logitech-mx-keys-s-graphite-us.png",
     "source_url": "https://www.logitech.com/en-us/shop/p/mx-keys-s",
     "image_source_url": "https://resource.logitech.com/content/dam/logitech/en/products/keyboards/mx-keys-s/migration-assets-for-delorean-2025/gallery/mx-keys-s-top-view-graphite-us.png",
@@ -489,8 +376,7 @@
       "ban phim",
       "keyboard"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   },
   {
     "id": 20,
@@ -499,11 +385,6 @@
     "color": "tonal graphite",
     "price": 39,
     "stock": 0,
-    "embedding": [
-      0.08,
-      0.16,
-      0.97
-    ],
     "image": "catalog/logitech-pebble-keys-2-k380s-tonal-graphite.png",
     "source_url": "https://www.logitech.com/en-us/shop/p/pebble-keys-2",
     "image_source_url": "https://resource.logitech.com/content/dam/logitech/en/products/keyboards/pebble-keys-2-k380s/2026/gallery/tonal-graphite/pebble-keys-k380s-2-tonal-graphite-top-angle-gallery-1.png",
@@ -517,7 +398,6 @@
       "ban phim",
       "keyboard"
     ],
-    "stock_is_demo": true,
-    "embedding_is_artificial": true
+    "stock_is_demo": true
   }
 ]

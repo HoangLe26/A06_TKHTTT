@@ -5,3 +5,9 @@ __pycache__/
 node_modules/
 tainguyen/tmp/
 ~$*.docx
+.env
+.env.*
+!.env.example
+CodePython/models/vosk-model-*/
+tainguyen/downloads/
+CodePython/models/clip-vit-base-patch32/

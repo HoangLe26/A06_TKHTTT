@@ -42,7 +42,8 @@ class SearchService:
                    'phụ kiện': 'accessory', 'phu kien': 'accessory'}
         for phrase, category in aliases.items():
             normalized = re.sub(r'(?<!\w)' + re.escape(phrase) + r'(?!\w)', category, normalized)
-        words = normalized.split()
+        # API phiên âm thường thêm dấu câu: "Find laptop." vẫn phải khớp "laptop".
+        words = re.findall(r'\w+', normalized)
         if not words:
             return []
         candidates = []
@@ -62,6 +63,8 @@ class SearchService:
         """So sánh vector truy vấn với các vector sản phẩm có cùng số chiều."""
         vector = normalize_embedding(query_embedding)
         dimension = self.vector_index.dimension
+        if dimension is None:
+            raise ValueError('Image index is not ready. Run tainguyen/CodePython/setup_clip.py and restart the server.')
         if dimension is not None and len(vector) != dimension:
             raise ValueError(
                 f"Image query dimension {len(vector)} does not match "

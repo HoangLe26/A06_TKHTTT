@@ -4,7 +4,7 @@ from .vector_validation import validate_embedding
 
 
 class VectorIndex:
-    """Ánh xạ ID sản phẩm sang vector số nhân tạo đã được kiểm tra."""
+    """Ánh xạ ID sản phẩm sang vector số đã được kiểm tra."""
 
     def __init__(self, products):
         """Tạo chỉ mục và yêu cầu mọi vector được lưu phải có cùng số chiều."""
